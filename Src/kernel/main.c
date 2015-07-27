@@ -1,5 +1,6 @@
 #include <console.h>
 #include <hal.h>
+#include <system.h>
 
 void kmain (void* MultibootStructure)
 {
@@ -7,6 +8,8 @@ void kmain (void* MultibootStructure)
 	Print_Info("Starting boot sequence");
 	Gdt_Install();
 	Print_Info("GDT Installed Successfully");
+	Idt_Install();
+	Print_Info("IDT Installed Successfully");
 }
 
 void Print_Info(string txt)

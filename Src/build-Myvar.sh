@@ -11,10 +11,13 @@ echo "==========="
 # Build C files
 
 $compiler $opt -o $build/main.o ./kernel/main.c 
+$compiler $opt -o $build/utils.o ./kernel/utils.c 
 $compiler $opt -o $build/console.o ./kernel/console.c 
+
+
 $compiler $opt -o $build/io.o ./kernel/HAL/io.c 
 $compiler $opt -o $build/gdt.o ./kernel/HAL/gdt.c
-
+$compiler $opt -o $build/idt.o ./kernel/HAL/idt.c
 
 # Build ASM files
 nasm -f elf ./kernel/loader.asm -o $build/loader.o
