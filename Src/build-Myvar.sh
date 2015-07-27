@@ -13,7 +13,7 @@ echo "==========="
 $compiler $opt -o $build/main.o ./kernel/main.c 
 $compiler $opt -o $build/console.o ./kernel/console.c 
 $compiler $opt -o $build/io.o ./kernel/HAL/io.c 
-
+$compiler $opt -o $build/gdt.o ./kernel/HAL/gdt.c
 
 
 # Build ASM files

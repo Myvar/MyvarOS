@@ -19,16 +19,25 @@ void Console_Write_Char(char c)
 
 void Console_Write_Char_Colored (char c, uint8 color)
 {
-	uint32 location = ConsoleCursor.X + ConsoleCursor.Y * ConsoleSize.X;
-	
-	VideoRam[2*location] = c;
-	VideoRam[2*location + 1] = color;
-			
-      ConsoleCursor.X++;
-	
-	if (ConsoleCursor.X >= ConsoleSize.X) {
+
+	if(c == '\n')
+	{
 		ConsoleCursor.X = 0;
 		ConsoleCursor.Y ++;
+	}
+	else
+	{
+		uint32 location = ConsoleCursor.X + ConsoleCursor.Y * ConsoleSize.X;
+	
+		VideoRam[2*location] = c;
+		VideoRam[2*location + 1] = color;
+			
+	      ConsoleCursor.X++;
+	
+		if (ConsoleCursor.X >= ConsoleSize.X) {
+			ConsoleCursor.X = 0;
+			ConsoleCursor.Y ++;
+		}
 	}
 }
 
