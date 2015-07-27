@@ -10,6 +10,10 @@ void kmain (void* MultibootStructure)
 	Print_Info("GDT Installed Successfully");
 	Idt_Install();
 	Print_Info("IDT Installed Successfully");
+	Isrs_Install();
+	Print_Info("Isrs Installed Successfully");
+	Irq_Install();
+	Print_Info("Irq Installed Successfully");
 }
 
 void Print_Info(string txt)

@@ -1,5 +1,4 @@
-
-#include <system.h>
+#include <hal.h>
 
 extern void isr0();
 extern void isr1();
@@ -35,7 +34,7 @@ extern void isr30();
 extern void isr31();
 
 
-void isrs_install()
+void Isrs_Install()
 {
     idt_set_gate(0, (unsigned)isr0, 0x08, 0x8E);
     idt_set_gate(1, (unsigned)isr1, 0x08, 0x8E);
@@ -119,8 +118,8 @@ void fault_handler(struct regs *r)
 {
     if (r->int_no < 32)
     {
-        puts(exception_messages[r->int_no]);
-        puts(" Exception. System Halted!\n");
+      //  puts(exception_messages[r->int_no]); //old os code
+       // puts(" Exception. System Halted!\n");
         for (;;);
     }
 }
