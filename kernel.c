@@ -239,6 +239,10 @@ void init_memory_management() {
 
             // Iterate over the ranges left. It may be one (original) or up to two times the number of split ranges.
             for (int x = 0; x < split_cnt; ++x) {
+              // Fix problem with split returning empty ranges.
+              if (o_size[x] == 0) {
+                  continue;
+              }
               puts("adding memory block to heap; base: ");
               itoa(o_off[x], 10, buf);
               puts(buf);
@@ -246,9 +250,11 @@ void init_memory_management() {
               itoa(o_size[x], 10, buf);
               puts(buf);
               puts("\n");
-              //k_heapBMAddBlock(&g_k_heap, o_off[x], o_size[x], 16);
+              k_heapBMAddBlock(&g_k_heap, o_off[x], o_size[x], 16);
               total_added += o_size[x];
             }
+
+            puts("ok\n");
         }
 
         mmap_entry = (MBMMAPENTRY*)((unsigned int)mmap_entry + mmap_entry->size + 4);

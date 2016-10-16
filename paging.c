@@ -21,8 +21,8 @@ void Init_Paging()
 	unsigned int* Page_Table1_Physical = (unsigned int*)((unsigned int)Page_Table1 - KERNEL_VIRTUAL_BASE);
 	unsigned int* Page_Directory_Physical = (unsigned int*)((unsigned int)Page_Directory - KERNEL_VIRTUAL_BASE);
 	
-	//Setting up identity mapping
-	while(index < (SizeOfPageTables + StartPageTableEntryIndex))
+	// Setting up identity mapping for the full address range. -kmcg
+	while(index < 1024 * 1024)
 	{
 		Page_Table1_Physical[index] = PhysicalAddressAndFlags;
 		index = index + 1;
@@ -32,7 +32,8 @@ void Init_Paging()
 	PhysicalAddressAndFlags = 7;
 	index = (KERNEL_PAGE_TABLE * 1024);
 	StartPageTableEntryIndex = (KERNEL_PAGE_TABLE * 1024);
-	
+
+	// Overwrite the portion for the kernel.
 	while(index < (SizeOfPageTables + StartPageTableEntryIndex))
 	{
 		Page_Table1_Physical[index] = PhysicalAddressAndFlags;
@@ -82,3 +83,12 @@ void Init_Paging()
 		"nop\n"
 	);
 }
+
+
+void Init_Frame()
+{
+
+
+}
+
+

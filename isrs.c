@@ -118,8 +118,21 @@ void fault_handler(struct regs *r)
 {
     if (r->int_no < 32)
     {
-       putError(exception_messages[r->int_no]);
-       // puts(" Exception. System Halted!\n");
+        putError(exception_messages[r->int_no]);
+        // puts(" Exception. System Halted!\n");
+
+        if (r->int_no == 14) {
+            // Print the page fault address.
+            char                buf[20];
+            unsigned int        addr;
+
+            asm("mov %%cr2, %%ebx\nmov %%ebx, %0" : "=r"(addr));
+            
+            puts("page fault address: ");
+            itoa(addr, 10, buf);
+            puts(buf);
+            puts("\n");
+        }
       
         for (;;);
     }

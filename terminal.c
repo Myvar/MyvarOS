@@ -111,12 +111,33 @@ void putError(char* string)
     Write_Serial('\n');
 }
 
+void scroll_up() {
+    for (int y = 1; y < 20; ++y) {
+        for (int x = 0; x < 80; ++x) {
+            unsigned int offset = (y * 80 + x) * 2;
+            unsigned int offset_up = offset - (80 * 2);
+
+            LFB[offset_up+0] = LFB[offset+0];
+            LFB[offset_up+1] = LFB[offset+1];
+            LFB[offset+0] = 0;
+            LFB[offset+1] = 0;
+        }
+    }
+}
+
 void putc(char c)
 {
+    Write_Serial(c);
+
     if(c == '\n')
     {
         LFB_X = 0;
         LFB_Y++;
+
+        if (LFB_Y >= 20) {
+            LFB_Y--;
+            scroll_up();
+        }        
     }
     else
     {
@@ -138,20 +159,6 @@ void putc(char c)
             }
             else
             { 
-
-                if(LFB_X >= 80)
-                {
-                    LFB_X = 0;
-                    LFB_Y++;
-                }
-                if(LFB_Y == 26)
-                {
-                    LFB_X = 0;
-                    LFB_Y = 0;
-
-                    Termianl_Clear();
-                }
-
                 int offset = ((LFB_Y * VGA_WIDTH) + LFB_X) * 2;
 
                 LFB[offset] = c;
@@ -159,7 +166,16 @@ void putc(char c)
 
                 LFB_X++;
 
-                
+                if(LFB_X >= 80)
+                {
+                    LFB_X = 0;
+                    LFB_Y++;
+
+                    if (LFB_Y >= 20) {
+                        LFB_Y--;
+                        scroll_up();
+                    }
+                }
             }
         }
     }
