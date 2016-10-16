@@ -71,18 +71,23 @@ void Shell_Registor_Command(char name[50], char helpmsg[255], void (*handler)(ch
 
 void ExecuteCommand(char* Command)
 {
+    
     int found = 0;
 
     int i = 0;
     for(i = 0; i < CommandTableIndex; i++)
     {       
+       
+        char** args;// = strsplit(Command, ' ');
+       
+        //puts(args[0]);
+       // puts(args[1]);
+
+        
         if(strcmp(CommandTable[i].name, Command) == 0)
         {
             found = 1;
             putc('\n');
-
-            char* args[0];
-
             CommandTable[i].handler(args);
 
             putc('\n');

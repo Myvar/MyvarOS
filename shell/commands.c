@@ -1,16 +1,11 @@
 #include <main.h>
 
-void Clear(char* args)
+void Clear(char* args[])
 {
     Termianl_Clear();
 }
 
-int test()
-{
-    
-}
-
-void Dump_Command()
+void Dump_Command(char* args[])
 {
     register int eax asm("eax");
     register int ebx asm("ebx");
@@ -18,12 +13,11 @@ void Dump_Command()
     register int edx asm("edx");
 
     char buf[255];
-    
+
     itoa(eax, 10, buf);
     puts("Eax: ");
     puts(buf);
     puts("\n");
-
     
     itoa(ebx, 10, buf);
     puts("Ebx: ");
@@ -41,6 +35,55 @@ void Dump_Command()
     puts("\n");
 }
 
+void DevidebyZero(char* args[])
+{
+    int a = 1;
+    int b = 0;
+
+    int c =  a / b;
+    putc(c);
+}
+
+void Args_Test(char* args[])
+{
+    int i = 0;
+    for(i = 0; i < sizeof(args); i++)
+    {
+        puts(args[i]);
+        puts("\n");
+    }
+}
+
+void Test_Paging()
+{
+    putLog("Starting Paging Test");
+
+    char* zero = 0x0;
+
+    int i = 0;
+    for(i = 0; i < (1024 * 1024); i++)
+    {
+        char buf[255];
+
+        char rd = *zero;
+        
+
+
+        itoa((int)zero, 10, buf);
+        putLog(buf);
+
+        zero += 4096;
+    }
+
+    putLog("Paging passed Sucesfullt");
+}
+
+
+void Test_PageFalt()
+{
+    int c = *((char*)0x400000);
+}
+
 void Init_Commands()
 {
     Shell_Registor_Command("clear", "Clears the screen", Clear);
@@ -48,4 +91,13 @@ void Init_Commands()
 
     Shell_Registor_Command("debug", "Dumps the registors to the screen", Dump_Command);
     Shell_Registor_Command("dump", "Dumps the registors to the screen", Dump_Command);
+
+    Shell_Registor_Command("dbz", "Devide by zero to test isrs", DevidebyZero);
+    
+    Shell_Registor_Command("args", "Test args Parsing", Args_Test);
+
+    Shell_Registor_Command("ptest", "Test Paging", Test_Paging);
+    Shell_Registor_Command("pfalt", "Cause Page Falt", Test_PageFalt);
+    
+    
 }

@@ -138,6 +138,20 @@ void putc(char c)
             }
             else
             { 
+
+                if(LFB_X >= 80)
+                {
+                    LFB_X = 0;
+                    LFB_Y++;
+                }
+                if(LFB_Y == 26)
+                {
+                    LFB_X = 0;
+                    LFB_Y = 0;
+
+                    Termianl_Clear();
+                }
+
                 int offset = ((LFB_Y * VGA_WIDTH) + LFB_X) * 2;
 
                 LFB[offset] = c;
@@ -145,11 +159,7 @@ void putc(char c)
 
                 LFB_X++;
 
-                if(LFB_X >= 80)
-                {
-                    LFB_X = 0;
-                    LFB_Y++;
-                }
+                
             }
         }
     }

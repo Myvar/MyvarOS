@@ -1,3 +1,5 @@
+extern void Test_Paging();
+
 extern void Termianl_Init();
 extern void Termianl_Clear();
 extern void Terminal_SetColor(char color, char bg);
@@ -33,7 +35,7 @@ struct regs
     unsigned int gs, fs, es, ds;
     unsigned int edi, esi, ebp, esp, ebx, edx, ecx, eax;
     unsigned int int_no, err_code;
-    unsigned int eip, cs, eflags, useresp, ss;    
+    unsigned int eip, cs, eflags, useresp, ss;  
 };
 
 struct Command {
@@ -61,6 +63,12 @@ extern char *strcpyc(char *s1, char s2);
 extern int strcmp(char *a, char *b);
 extern void strappend(char* s, char c);
 extern void strremovelast(char* s);
-
+extern char ** strsplit(char* a_str, char a_delim);
+extern char *strclamp(char *str);
 
 extern void Init_Commands();
+
+extern void Init_Paging();
+
+extern void* kmalloc(unsigned int size);
+extern void kfree(void *ptr);

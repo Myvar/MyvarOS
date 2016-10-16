@@ -1,7 +1,11 @@
 BITS 32
 
 GLOBAL _Kernel_Start:function
+GLOBAL MultibootInfo_Structure
+GLOBAL g_ImageRefCall
 
+KERNEL_VIRTUAL_BASE equ 0xC0000000
+KERNEL_PAGE_TABLE equ (KERNEL_VIRTUAL_BASE >> 22)	; Constant declaring Page Table index in virtual memory
 SECTION .text
 
 ; BEGIN - Multiboot Header
@@ -35,15 +39,17 @@ _Kernel_Start:
 	; Make sure a MultiBoot boot loader but this beast
 	mov dword ECX, 0x2BADB002
 	cmp ECX, EAX
-	jne HandleNoMultiboot
+	jne (HandleNoMultiboot - KERNEL_VIRTUAL_BASE)
 	
-	mov dword [MultibootInfo_Structure], EBX
+	mov dword [MultibootInfo_Structure - KERNEL_VIRTUAL_BASE], EBX
 	add dword EBX, 0x4
 	mov dword EAX, [EBX]
-	mov dword [MultibootInfo_Memory_Low], EAX
+	mov dword [MultibootInfo_Memory_Low - KERNEL_VIRTUAL_BASE], EAX
 	add dword EBX, 0x4
 	mov dword EAX, [EBX]
-	mov dword [MultibootInfo_Memory_High], EAX	
+	mov dword [MultibootInfo_Memory_High - KERNEL_VIRTUAL_BASE], EAX
+
+	;mov dword [MultibootInfo_Structure - KERNEL_VIRTUAL_BASE], 0x0
 	
 	;Switch to protected mode 
 	mov dword EAX, CR0
@@ -51,13 +57,13 @@ _Kernel_Start:
 	mov dword CR0, EAX
 
 	;Set stack pointer
-	mov dword ESP, Kernel_Stack_Start
-	
+	mov dword ESP, (Kernel_Stack_Start - KERNEL_VIRTUAL_BASE)
 	
 	;Tell CPU about GDT
-	mov dword [GDT_Pointer + 2], GDT_Contents
-	mov dword EAX, GDT_Pointer
+	mov dword [GDT_Pointer  - KERNEL_VIRTUAL_BASE + 2], (GDT_Contents - KERNEL_VIRTUAL_BASE)
+	mov dword EAX, (GDT_Pointer - KERNEL_VIRTUAL_BASE)
 	lgdt [EAX]
+
 	;Set data segments
 	mov dword EAX, 0x10
 	mov word DS, EAX
@@ -66,12 +72,18 @@ _Kernel_Start:
 	mov word GS, EAX
 	mov word SS, EAX
 	; Force reload of code segment
-	jmp 8:Boot_FlushCsGDT
-Boot_FlushCsGDT:
+	jmp 8:(Boot_FlushCsGDT - KERNEL_VIRTUAL_BASE)
+Boot_FlushCsGDT:	
+
+	; This will the actual address of image ref onto the stack. A relative
+	; call instruction should be emitted.
+	call g_ImageRefCall
+g_ImageRefCall:
 
 	extern kernel_main
-	call kernel_main	
-	
+	lea EAX, [kernel_main - KERNEL_VIRTUAL_BASE]
+	call EAX
+
 	jmp Halt
 
 HandleNoMultiboot:
@@ -91,6 +103,13 @@ Halt:
 	jmp Halt
 
 
-xpos db 0
-ypos db 0
-msg db "MyvarOS Booted", 0 
+SECTION .bss
+
+GLOBAL Page_Table1:data
+GLOBAL Page_Directory:data
+
+align 4096
+Page_Table1: resb (1024 * 4 * 1024)	; Reserve uninitialised space for Page Table -  # of entries/page table * 4 bytes/entry * total # of page tables 
+											; actual size = 4194304 bytes = 4MiB, represents 4GiB in physical memory
+											; ie. each 4 byte entry represent 4 KiB in physical memory
+Page_Directory: resb (1024 * 4 * 1) ; Reserve uninitialised space for Page Directory - # of pages tables * 4 bytes/entry * # of directory (4096 = 4 KiB)
