@@ -17,6 +17,7 @@ gcc $gcc_opts -masm=intel -c serial.c -o ./tmp/serial.o
 gcc $gcc_opts -masm=intel -c idt.c -o ./tmp/idt.o
 gcc $gcc_opts -masm=intel -c isrs.c -o ./tmp/isrs.o
 gcc $gcc_opts -masm=intel -c irq.c -o ./tmp/irq.o
+gcc $gcc_opts -masm=intel -c ./drivers/atapi.c -o ./tmp/driver_atapi.o
 gcc $gcc_opts -masm=intel -c ./drivers/keybord.c -o ./tmp/driver_ketybord.o
 gcc $gcc_opts -masm=intel -c ./shell/shell.c -o ./tmp/shell.o
 gcc $gcc_opts -masm=intel -c ./shell/commands.c -o ./tmp/commands.o

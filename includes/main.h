@@ -72,3 +72,8 @@ extern void Init_Paging();
 
 extern void* kmalloc(unsigned int size);
 extern void kfree(void *ptr);
+
+
+extern void dump_atapi_data(unsigned short channel);
+extern int atapi_irq_hook(struct regs *r);
+extern void atapi_read(unsigned short channel, unsigned char slave);
