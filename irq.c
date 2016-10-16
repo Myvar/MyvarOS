@@ -1,5 +1,8 @@
 #include <main.h>
 
+#include "irq.h"
+#include "linklist.h"
+
 extern void irq0();
 extern void irq1();
 extern void irq2();
@@ -48,9 +51,55 @@ void irq_remap(void)
     outportb(0xA1, 0x0);
 }
 
+// Allows multiple handlers to be installed per IRQ and
+// the order sets the priority since handlers can prevent
+// the event from being propogated to the next handler.
+static LLITEM *handlers[64];
+
+void irq_hook(unsigned short irq_num, IRQ_HANDLER handler) {
+    LLITEM *item = kmalloc(sizeof(LLITEM));
+
+    char buf[20];
+    puts("install irq hook ");
+    itoa((unsigned int)item, 10, buf);
+    puts(buf);
+    puts("\n");
+
+    item->data = (unsigned int)handler;
+    
+    ll_add_next(&handlers[irq_num], item);
+}
+
+void process_hooks(struct regs *r) {
+    LLITEM *citem = handlers[r->int_no];
+    IRQ_HANDLER handler;
+
+    /*
+    char buf[20];
+    puts("trying ");
+    itoa((unsigned int)citem, 10, buf);
+    puts(buf);
+    puts(" irq\n");
+    */
+
+    while (citem) {
+        handler = (IRQ_HANDLER)citem->data;
+        puts("irq hook found\n");
+        if (handler(r) < 0) {
+            // The handler aborted propogation of the event.
+            break;
+        }
+        citem = citem->next;
+    }
+}
+
 
 void Irq_Install()
 {
+    for (int x = 0; x < sizeof(handlers) / sizeof(LLITEM*); ++x) {
+        handlers[x] = 0;
+    }
+
     irq_remap();
 
     idt_set_gate(32, (unsigned)irq0, 0x08, 0x8E);
@@ -79,10 +128,13 @@ void irq_handler(struct regs *r)
 
     
     handler = irq_routines[r->int_no - 32];
+
     if (handler)
     {
         handler(r);
     }
+
+    process_hooks(r);
 
     if (r->int_no >= 40)
     {

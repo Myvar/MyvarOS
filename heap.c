@@ -65,12 +65,7 @@ void *k_heapBMAlloc(KHEAPBM *heap, uint32 size) {
 			bneed = (size / b->bsize) * b->bsize < size ? size / b->bsize + 1 : size / b->bsize;
 			bm = (uint8*)&b[1];
  
-			for (x = (b->lfb + 1 >= bcnt ? 0 : b->lfb + 1); x < b->lfb; ++x) {
-				/* just wrap around */
-				if (x >= bcnt) {
-					x = 0;
-				}		
- 
+			for (x = (b->lfb + 1 >= bcnt ? 0 : b->lfb + 1); x != b->lfb; x = x + 1 >= bcnt ? 0 : x + 1) {
 				if (bm[x] == 0) {	
 					/* count free blocks */
 					for (y = 0; bm[x + y] == 0 && y < bneed && (x + y) < bcnt; ++y);

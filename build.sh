@@ -23,6 +23,7 @@ gcc $gcc_opts -masm=intel -c ./shell/commands.c -o ./tmp/commands.o
 gcc $gcc_opts -masm=intel -c ./string.c -o ./tmp/string.o
 gcc $gcc_opts -masm=intel -c ./paging.c -o ./tmp/paging.o
 gcc $gcc_opts -masm=intel -c ./heap.c -o ./tmp/heap.o
+gcc $gcc_opts -masm=intel -c ./linklist.c -o ./tmp/linklist.o
 
 echo "linking"
 ld -m elf_i386 -T linker.ld -o ./bin/krnlld.bin ./tmp/*.o 
