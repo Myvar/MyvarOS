@@ -5,6 +5,11 @@ gcc_opts="-m32 -I ./includes -std=gnu99 -fno-builtin -ffreestanding  -w -O2 -Wal
 cp boot.txt ./bin/boot.txt
 
 echo "compiling ..."
+
+if [ ! -d "tmp" ]; then
+  mkdir tmp
+fi
+
 nasm -g -f elf -o ./tmp/bootstrap.o bootstrap.asm
 nasm -g -f elf -o ./tmp/idt_asm.o idt.asm
 nasm -g -f elf -o ./tmp/isrs_asm.o isrs.asm
