@@ -322,7 +322,7 @@ void kernel_HigherHalf()
 
     while (1 == 1)
     {
-       putc(Read_Serial());
+       Kb_Sendkey(Read_Serial());
     }
 }
 

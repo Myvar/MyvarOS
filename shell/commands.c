@@ -1,6 +1,20 @@
 #include <main.h>
 #include "irq.h"
 
+static inline void outportw(unsigned short port, unsigned short val)
+{
+     asm volatile ( "outw %1, %0" : : "a"(val), "Nd"(port) );
+}
+
+static inline unsigned short inportw(unsigned short port)
+{
+    unsigned short ret;
+    asm volatile ( "inw %0, %1"
+                   : "=a"(ret)
+                   : "Nd"(port) );
+    return ret;
+}
+
 void Clear(char* args[])
 {
     Termianl_Clear();
@@ -85,34 +99,6 @@ void Test_PageFalt()
     int c = *((char*)0x400000);
 }
 
-static inline void outb(unsigned short port, unsigned char val)
-{
-     asm volatile ( "outb %1, %0" : : "a"(val), "Nd"(port) );
-}
-
-static inline unsigned char inb(unsigned short port)
-{
-    unsigned char ret;
-    asm volatile ( "inb %0, %1"
-                   : "=a"(ret)
-                   : "Nd"(port) );
-    return ret;
-}
-
-static inline void outw(unsigned short port, unsigned short val)
-{
-     asm volatile ( "outw %1, %0" : : "a"(val), "Nd"(port) );
-}
-
-static inline unsigned short inw(unsigned short port)
-{
-    unsigned short ret;
-    asm volatile ( "inw %0, %1"
-                   : "=a"(ret)
-                   : "Nd"(port) );
-    return ret;
-}
-
 #define CHANNEL 0x170
 
 void dump_atapi_data(unsigned short channel) {
@@ -120,7 +106,7 @@ void dump_atapi_data(unsigned short channel) {
     unsigned short size;
     unsigned short valw;
 
-    size = inb(channel + 5) << 8 | inb(channel + 4);
+    size = inportb(channel + 5) << 8 | inportb(channel + 4);
     itoa(size, 10, buf);
     puts("size ");
     puts(buf);
@@ -128,7 +114,7 @@ void dump_atapi_data(unsigned short channel) {
 
     puts("data ");
     for (int x = 0; x < size / 2; ++x) {
-        valw = inw(channel);
+        valw = inportw(channel);
         itoa(valw, 10, buf);
         puts(buf);
         puts(" ");        
@@ -151,18 +137,18 @@ void atapi_read(unsigned short channel, unsigned char slave) {
 
     puts("sending atapi command\n");
 
-    outb(channel + 6, slave & (1 << 4));    // slave bit
-    outb(channel + 1, 0);        // no DMA
-    outb(channel + 4, 2048 & 0xff);       // sector count low 
-    outb(channel + 5, 2048 >> 8);        // sector count high
-    outb(channel + 7, 0xa0);     // packet command
+    outportb(channel + 6, slave & (1 << 4));    // slave bit
+    outportb(channel + 1, 0);        // no DMA
+    outportb(channel + 4, 2048 & 0xff);       // sector count low 
+    outportb(channel + 5, 2048 >> 8);        // sector count high
+    outportb(channel + 7, 0xa0);     // packet command
 
-    outw(channel, 0x00a8); // 1 0
-    outw(channel, 0x0000); // 3 2
-    outw(channel, 0x0000); // 5 4
-    outw(channel, 0x0000); // 7 6
-    outw(channel, 0x0100); // 9 8
-    outw(channel, 0x0000); // 11 10
+    outportw(channel, 0x00a8); // 1 0
+    outportw(channel, 0x0000); // 3 2
+    outportw(channel, 0x0000); // 5 4
+    outportw(channel, 0x0000); // 7 6
+    outportw(channel, 0x0100); // 9 8
+    outportw(channel, 0x0000); // 11 10
 
     while (!atapi_irq_signal);
     atapi_irq_signal = 0;

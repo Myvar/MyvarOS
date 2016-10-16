@@ -76,6 +76,20 @@ void keyboard_handler(struct regs *r)
     }
 }
 
+void Kb_Sendkey(char c)
+{
+    int i  = 0;
+    for(i = 0; i < 16; i++)
+    {
+        void (*handler)(char c) = kb_handlers[i];
+
+        if(kb_handlers[i] != 0)
+        {
+            handler(c);
+        }
+    }
+}
+
 char convert_scancode(int c)
 {
     return kbdus[c];
