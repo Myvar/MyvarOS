@@ -179,6 +179,20 @@ void Test_CDRead() {
     atapi_read(0x170, 0xa0);
 }
 
+
+void Test_Heap()
+{
+    void* mem = kmalloc(8);
+    putLog("Allocating 8 bytes of memmory");
+
+    char buf[255];
+
+    itoa(mem, 16, buf);
+    puts("Addres: 0x");
+    puts(buf);
+    puts("\n");
+}
+
 void Init_Commands()
 {
 
@@ -194,6 +208,8 @@ void Init_Commands()
 
     Shell_Registor_Command("ptest", "Test Paging", Test_Paging);
     Shell_Registor_Command("pfalt", "Cause Page Falt", Test_PageFalt);
+
+    Shell_Registor_Command("theap", "Test Heap", Test_Heap);    
 
     Shell_Registor_Command("cdreadtest", "Test reading CD-ROM", Test_CDRead);
 }
