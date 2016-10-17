@@ -1,0 +1,12 @@
+imports System
+
+scope MyvarOS
+
+type Program
+{
+    @entry
+    fn Main() 
+    {       
+        puts(i);       
+    }
+}
