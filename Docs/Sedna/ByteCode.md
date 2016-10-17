@@ -77,3 +77,13 @@ Loads a string on the stack
 ID: 0x20
 
 Parameter 1: Stiring
+
+
+### Call
+
+Loads a string on the stack
+
+ID: 0x30
+
+Parameter 1: Stiring
+
