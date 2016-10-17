@@ -89,6 +89,7 @@
 --reference:/home/myvar/.nuget/packages/System.Xml.XDocument/4.0.11/ref/netstandard1.3/System.Xml.XDocument.dll
 /home/myvar/Desktop/MyvarOS/Sedna/Error.cs
 /home/myvar/Desktop/MyvarOS/Sedna/Parser.cs
+/home/myvar/Desktop/MyvarOS/Sedna/ByteCode.cs
 /home/myvar/Desktop/MyvarOS/Sedna/Compiler.cs
 /home/myvar/Desktop/MyvarOS/Sedna/Program.cs
 /home/myvar/Desktop/MyvarOS/Sedna/Internals/IAst.cs

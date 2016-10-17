@@ -7,6 +7,6 @@ type Program
     @entry
     fn Main() 
     {       
-        puts(i);       
+        puts("Test Program");       
     }
 }

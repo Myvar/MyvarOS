@@ -30,14 +30,17 @@ namespace Sedna.Core
             */
             _Scope = new CompilerScope();
            
+            var bc = new ByteCode();
+
             foreach (var i in src)
             {
                 var x = Parser.Parse(File.ReadAllText(i));
 
                 if (!CheckErrors()) return;
-                //build byte code
+                bc.Emit(x);
             }
 
+            bc.Write(Output);
            
         }
 
