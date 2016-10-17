@@ -1,6 +1,19 @@
 # Byte Code
 this file will outline the bytecode, i will update it as i implment it.
 
+# Virtual machien
+The language Is Stack baced so prameters are on stack
+
+Create a VM for every Scope, and load modules into it so when call opcode:
+
+for eg.
+
+[NotePad]Program::Main
+will make a call to the kernel NotePad VM at module Program it will call the method main.
+
+Note the for eg. [Kernel]Terminal::puts
+will call the Kernel vm witch will not be a VM but rather a plug and this is how system calls will be executed.
+
 # Data Types
 
 Byte = unsigned byte;
@@ -37,9 +50,17 @@ String = Int lenth followed by byte[]; //asci
   {
     String Name;
     String Bace;
-    Opcode[]
-    {
-      //opcode format depends on the opcode it self
+    
+    Int Methods;
+    Methods[]
+    {    
+      String Name;
+      Int Parameters;
+      Parameters[] { String type }
+      Opcode[]
+      {
+        //opcode format depends on the opcode it self
+      }
     }
   }
   
