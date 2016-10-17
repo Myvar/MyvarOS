@@ -1,5 +1,5 @@
 # MyvarOS
-A OS written in C
+An Operating System
 
 # Build / Run
 
