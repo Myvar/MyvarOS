@@ -57,6 +57,7 @@ String = Int lenth followed by byte[]; //asci
       String Name;
       Int Parameters;
       Parameters[] { String type }
+      Int Opcodes;
       Opcode[]
       {
         //opcode format depends on the opcode it self
