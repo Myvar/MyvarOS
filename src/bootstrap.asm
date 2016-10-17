@@ -40,7 +40,7 @@ _Kernel_Start:
 	mov dword ECX, 0x2BADB002
 	cmp ECX, EAX
 	jne (HandleNoMultiboot - KERNEL_VIRTUAL_BASE)
-	
+
 	mov dword [MultibootInfo_Structure - KERNEL_VIRTUAL_BASE], EBX
 	add dword EBX, 0x4
 	mov dword EAX, [EBX]
