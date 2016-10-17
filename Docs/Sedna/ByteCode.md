@@ -66,3 +66,13 @@ String = Int lenth followed by byte[]; //asci
   
 }
 ```
+
+# Opcodes
+
+### LoadStr
+
+Loads a string on the stack
+
+ID: 0x20
+
+Parameter 1: Stiring
