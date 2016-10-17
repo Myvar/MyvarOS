@@ -3,12 +3,14 @@
 '''
 
 
-# Default binary.
-NASM_BIN = "nasm"
-GCC_BIN = "gcc"
-LD_BIN = "ld"
-ISO_BIN = 'mkisofs'
-QEMU_I386_BIN = 'qemu-system-i386'
+BIN_PATHS = {
+	'NASM_BIN': "nasm",
+	'GCC_BIN': "gcc",
+	'LD_BIN': "ld",
+	'ISO_BIN': 'mkisofs',
+	'QEMU_I386_BIN': 'qemu-system-i386',
+	'CSHARP_COMPILER_BIN': 'mcs',
+}
 
 KERNEL_QEMU_OPTS = [
 	'${QEMU_BIN}',
@@ -56,6 +58,12 @@ GCC_OPTS = [
 	'-o', '${OUTPUT}',
 ]
 
+SEDNA_CSHARP_COMPILER_OPTS = [
+	'${CSHARP_COMPILER_BIN}',
+	'-out:${OUTPUT}',
+	'${INPUT}',
+]
+
 NASM_OPTS = [
 	'${NASM_BIN}', 
 	'-g', 
@@ -64,7 +72,30 @@ NASM_OPTS = [
 	'${INPUT}'
 ]
 
-sources = [
+SEDNA_SOURCES = [
+	'sedna/Program.cs',
+	'sedna/Parser.cs',
+	'sedna/Compiler.cs',
+	'sedna/Error.cs',
+	'sedna/ByteCode.cs',
+	'sedna/Internals/CompilerScope.cs',
+	'sedna/Internals/IAst.cs',
+	'sedna/Internals/Token.cs',
+	'sedna/Internals/Ast/AttributeStmt.cs',
+	'sedna/Internals/Ast/DecStmt.cs',
+	'sedna/Internals/Ast/ExpressionStmt.cs',
+	'sedna/Internals/Ast/FnStmt.cs',
+	'sedna/Internals/Ast/ImportStmt.cs',
+	'sedna/Internals/Ast/InvokeStmt.cs',
+	'sedna/Internals/Ast/LoopStmt.cs',
+	'sedna/Internals/Ast/RetStmt.cs',
+	'sedna/Internals/Ast/ScopeStmt.cs',
+	'sedna/Internals/Ast/TypeStmt.cs',
+	'sedna/Internals/Ast/ValueStmt.cs',
+	'sedna/Internals/Ast/WhenStmt.cs',
+]
+
+KERNEL_SOURCES = [
 	'src/kernel.c',
 	'src/terminal.c',
 	'src/io.c',
