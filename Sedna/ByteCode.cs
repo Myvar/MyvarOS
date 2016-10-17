@@ -126,7 +126,7 @@ namespace Sedna.Core
                 count++;
 
                 WriteByte(0x30);//call opcode
-                WriteString(x.Path);
+                WriteString(ResolveCall(x.Path));
             }
         }
 
