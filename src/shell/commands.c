@@ -108,6 +108,171 @@ void Test_Heap()
     puts("\n");
 }
 
+void PutString(char *s, int lenght )
+{    
+    int i = 0;
+    for(i = 0; i < lenght; i++)
+    {
+        putc(s[i]);       
+    }
+
+}
+
+unsigned int            SednaStart;
+void Test_Sedna()
+{
+    char *s = (char*)&SednaStart;
+
+    char buf[255];
+
+    int offset = 0;
+
+    offset += 4;
+
+    puts("Scope:\n");
+    PutString((char*)&SednaStart + offset, ((int*)s)[0]);  
+    puts("\n");puts("\n"); 
+    
+    offset += ((int*)s)[0];
+
+    int total_Imports = ((int*)s)[offset];
+
+    itoa(total_Imports, 10, buf);
+    puts("Total Imports: ");
+    puts(buf);
+    puts("\n"); 
+
+    offset += 4;
+
+    int index = 0;
+    for(index = 0; index < total_Imports; index++)
+    {   puts("Imports: ");
+        int l = (s)[offset];
+        offset += 4;
+        PutString((char*)&SednaStart + offset, l);  
+        puts("\n"); 
+
+        offset += l;
+
+    }
+    puts("\n");
+
+    int total_Types = (s)[offset];
+
+    itoa(total_Types, 10, buf);
+    puts("Total Types: ");
+    puts(buf);
+    puts("\n"); 
+
+    offset += 4;
+
+    index = 0;
+    for(index = 0; index < total_Types; index++)
+    {   puts("Type: ");
+        int l = (s)[offset];
+        offset += 4;
+        PutString((char*)&SednaStart + offset, l);  
+        puts("\n"); 
+
+        offset += l;
+
+        puts("Class bace type: ");
+        l = (s)[offset];
+        offset += 4;
+        PutString((char*)&SednaStart + offset, l);
+        if(l == 0)
+        {
+            puts("none");
+        }  
+        puts("\n"); 
+
+        offset += l;
+    }
+
+
+    puts("\n");
+
+    int total_fns= (s)[offset];
+
+    itoa(total_fns, 10, buf);
+    puts("Total Methods: ");
+    puts(buf);
+    puts("\n"); 
+
+    offset += 4;
+
+    index = 0;
+    for(index = 0; index < total_fns; index++)
+    {   puts("Method Name: ");
+        int l = (s)[offset];
+        offset += 4;
+        PutString((char*)&SednaStart + offset, l);  
+        puts("\n"); 
+
+        offset += l;
+
+        int total_para= (s)[offset];
+
+        itoa(total_para, 10, buf);
+        puts("Total Parameters: ");
+        puts(buf);
+        puts("\n"); 
+
+        offset += 4;
+
+        int x = 0;
+        for(x = 0; x < total_para; x++)
+        {
+            puts("Parameter Type: ");
+            int l = (s)[offset];
+            offset += 4;
+            PutString((char*)&SednaStart + offset, l);  
+            puts("\n"); 
+
+            offset += l;
+        }
+puts("\n"); 
+        int total_ops = (s)[offset];
+
+        itoa(total_ops, 10, buf);
+        puts("Total Opcodes: ");
+        puts(buf);
+        puts("\n"); 
+        offset += 4;
+
+        for(x = 0; x < total_ops; x++)
+        {
+            if(s[offset] == 0x20)
+            {
+                puts("LoadStr: \"");
+                offset++;
+                int l = (s)[offset];
+                offset += 4;
+                PutString((char*)&SednaStart + offset, l);  
+                puts("\"\n"); 
+
+                offset += l;
+
+            }
+            if(s[offset] == 0x30)
+            {
+                puts("Call: \"");
+                offset++;
+                int l = (s)[offset];
+                offset += 4;
+                PutString((char*)&SednaStart + offset, l);  
+                puts("\"\n"); 
+
+                offset += l;
+
+            }
+        }
+
+    }
+}
+
+
+
 void Init_Commands()
 {
 
@@ -127,4 +292,6 @@ void Init_Commands()
     Shell_Registor_Command("theap", "Test Heap", Test_Heap);    
 
     Shell_Registor_Command("cdreadtest", "Test reading CD-ROM", Test_CDRead);
+
+    Shell_Registor_Command("tsedna", "Sedna testing command", Test_Sedna);
 }

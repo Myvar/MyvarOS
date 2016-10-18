@@ -15,6 +15,8 @@ SECTIONS {
 		*(.bss);
 	}
 
+	SednaStart = .;
+
 	.sedna : AT(ADDR(.sedna) - 0xC0000000) {
 		*(.sedna)
 	}

@@ -34,7 +34,6 @@ namespace Sedna.Core
                 {
                     var x = i as ImportStmt;
                     imports.Add(x.ScopeName);
-                    break;
                 }
             }
 
