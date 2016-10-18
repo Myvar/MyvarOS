@@ -15,8 +15,16 @@ SECTIONS {
 		*(.bss);
 	}
 
+	.data : AT(ADDR(.data) - 0xC0000000) {
+		*(.data);
+	}
+
+	.rodata : AT(ADDR(.rodata) - 0xC0000000) {
+		*(.rodata);
+	}
+
 	.sedna : AT(ADDR(.sedna) - 0xC0000000) {
-		*(.sedna)
+		*(.sedna);
 	}
 
 	KERNEL_END_VADDR = .;
