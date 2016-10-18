@@ -133,9 +133,9 @@ void Test_Sedna()
     PutString((char*)&SednaStart + offset, ((int*)s)[0]);  
     puts("\n");puts("\n"); 
     
-    offset += ((int*)s)[0];
+    offset += (s)[0];
 
-    int total_Imports = ((int*)s)[offset];
+    int total_Imports = (s)[offset];
 
     itoa(total_Imports, 10, buf);
     puts("Total Imports: ");
