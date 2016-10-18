@@ -13,7 +13,7 @@ BIN_PATHS = {
 }
 
 KERNEL_QEMU_OPTS = [
-	'${QEMU_BIN}',
+	'${QEMU_I386_BIN}',
 	'-m', '4G',
 	'-cdrom', '${INPUT}',
 	'-serial', 'tcp:127.0.0.1:4444,server${QEMU_SERIAL_DEBUG_NOWAIT}',
@@ -115,4 +115,5 @@ KERNEL_SOURCES = [
 	'src/idt.asm',
 	'src/isrs.asm',
 	'src/irq.asm',
+	'bin/ksedna.o',
 ]

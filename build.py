@@ -20,26 +20,32 @@ def print_risk(title, msg):
 	if 'QUIET' in os.environ and os.environ['QUIET'] == '1':
 		return
 	print(bcolors.OKBLUE + '[' + title + '] ' + bcolors.OKBLUE + msg + bcolors.ENDC)
+
 def print_good(title, msg):
 	if 'QUIET' in os.environ and os.environ['QUIET'] == '1':
 		return	
 	print(bcolors.OKGREEN + '[' + title + '] ' + bcolors.OKGREEN + msg + bcolors.ENDC)	
+
 def print_fail(title, msg):
 	if 'QUIET' in os.environ and os.environ['QUIET'] == '1':
 		return	
 	print(bcolors.HEADER + '[' + title + ']\n' + bcolors.FAIL + msg + bcolors.ENDC)
+
 def print_linking(msg):
 	if 'QUIET' in os.environ and os.environ['QUIET'] == '1':
 		return	
 	print(bcolors.OKBLUE + '[LINKING] ' + bcolors.OKBLUE + msg + bcolors.ENDC)
+
 def print_compiling(msg):
 	if 'QUIET' in os.environ and os.environ['QUIET'] == '1':
 		return	
 	print(bcolors.OKBLUE + '[BUILDING] ' + bcolors.OKBLUE + msg + bcolors.ENDC)
+
 def print_compile_skip(msg):
 	if 'QUIET' in os.environ and os.environ['QUIET'] == '1':
 		return	
 	print(bcolors.OKGREEN + '[OK] ' + bcolors.OKGREEN + msg + bcolors.ENDC)
+
 def print_compile_fail(msg):
 	if 'QUIET' in os.environ and os.environ['QUIET'] == '1':
 		return	
@@ -60,6 +66,8 @@ def run(cmdline, stdout=None, stderr=None, comm_timeout=120):
 	if 'MAKE_SHELL_SCRIPT' in os.environ and os.environ['MAKE_SHELL_SCRIPT'] == '1':
 		print(cmdline)
 		return (b'', b'')
+	if 'VERBOSE' in os.environ and os.environ['VERBOSE'] == '1':
+		print(cmdline)
 	proc = subprocess.Popen(cmdline, shell=True, stderr=stderr, stdout=stdout)
 	return proc.communicate(timeout=comm_timeout)
 
@@ -84,12 +92,50 @@ def action_csharp_build(copts, sources, output):
 	return run(' '.join(opts), stderr=subprocess.PIPE)
 
 def action_build_sedna(copts):
-	(outs, errs) = action_csharp_build(copts, config.SEDNA_SOURCES, '${BASE_DIR}/sedna/compiler.exe')
+	if os.path.exists('./bin') is False:
+		os.makedirs('./bin')
+
+	(outs, errs) = action_csharp_build(copts, config.SEDNA_SOURCES, '${BASE_DIR}/bin/compiler.exe')
 
 	if len(errs) > 0:
 		print_compile_fail(errs.decode('utf8'))
 		print('Build stopped because of errors.')
 		exit(-1)
+
+def action_build_sedna_kernel_module(copts):
+	if os.path.exists('./bin') is False:
+		os.makedirs('./bin')
+
+	# Build sedna kernel module bytecode.
+	opts = ['${BASE_DIR}/bin/compiler.exe', '${BASE_DIR}/bin/main.sbc', '${BASE_DIR}/sedna/main.sn']
+	opts = transform_opts(opts, {
+		'BASE_DIR':	    os.path.abspath('./'),
+	})
+	(outs, errs) = run(' '.join(opts), stderr=subprocess.PIPE)
+	if len(errs) > 0:
+		print_compile_fail(errs.decode('utf8'))
+		print('Build stopped because of errors.')
+		exit(-1)	
+
+	fd = open('./bin/sedna_wrap.asm', 'w')
+	fd.write('BITS 32\n')
+	fd.write('SECTION .sedna\n')
+	fd.write('INCBIN "%s/main.sbc"\n' % os.path.abspath('./bin/'))
+	fd.close()
+
+	# Build sedna kernel module.
+	opts = ['${NASM_BIN}', '-g', '-f', 'elf', '-o', '${BASE_DIR}/bin/ksedna.o', '${BASE_DIR}/bin/sedna_wrap.asm']
+	opts = transform_opts(opts, {
+		'BASE_DIR':	    os.path.abspath('./'),
+	})
+
+	(outs, errs) = run(' '.join(opts), stderr=subprocess.PIPE)
+	if len(errs) > 0:
+		print_compile_fail(errs.decode('utf8'))
+		print('Build stopped because of errors.')
+		exit(-1)	
+
+
 
 def action_build_kernel(copts):
 	if os.path.exists('./bin') is False:
@@ -111,6 +157,10 @@ def action_build_kernel(copts):
 		(bsrc, esrc) = os.path.splitext(fsrc)
 
 		(_, src) = os.path.split(fsrc)
+
+		if esrc == '.o':
+			objs.append(fsrc)
+			continue
 
 		fout = os.path.abspath('bin/%s.o' % (src))
 
@@ -145,9 +195,6 @@ def action_build_kernel(copts):
 			print('The extension "%s" is unknown for source "%s".' % (esrc, src))
 			exit(-1)
 
-		if 'VERBOSE' in os.environ and os.environ['VERBOSE'] == '1':
-			print(' '.join(opts))
-
 		(outs, errs) = run(' '.join(opts), stderr=subprocess.PIPE)
 		
 		if len(errs) > 0:
@@ -161,9 +208,6 @@ def action_build_kernel(copts):
 		'INPUT':			' '.join(objs),
 		'OUTPUT':			os.path.abspath('./bin/krnlld.bin'),
 	})
-
-	if 'VERBOSE' in os.environ and os.environ['VERBOSE'] == '1':
-		print(' '.join(opts))
 
 	print_linking('krnlld.bin')
 
@@ -203,7 +247,6 @@ def action_build_kernel(copts):
 
 	print_good('RESULT', 'BUILD SUCCESS')
 
-
 def action_run(copts):
 	if copts.system[0] != 'kernel':
 		print('Only supported system to run is "kernel".')
@@ -215,9 +258,6 @@ def action_run(copts):
 		'ISO_DIR':			os.path.abspath('./bin/iso'),
 		'INPUT':	    	os.path.abspath('./bin/myvaros.iso'),
 	})
-
-	if 'VERBOSE' in os.environ and os.environ['VERBOSE'] == '1':
-		print(' '.join(opts))
 
 	try:
 		run(' '.join(opts), stdout=sys.stdout, stderr=sys.stderr, comm_timeout=None)
@@ -231,12 +271,11 @@ systems_build = {
 	'kernel': {
 		'handler': action_build_kernel,
 		'deps': [
+			'sedna_kernel_module',
 		]
 	},
-	'sedna': {
-		# Just a dummy system that causes other
-		# systems to be built using the `deps`
-		# field.
+	'sedna_kernel_module': {
+		'handler': action_build_sedna_kernel_module,
 		'deps': {
 			'sedna_compiler',
 		}
