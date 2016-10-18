@@ -20,26 +20,32 @@ def print_risk(title, msg):
 	if 'QUIET' in os.environ and os.environ['QUIET'] == '1':
 		return
 	print(bcolors.OKBLUE + '[' + title + '] ' + bcolors.OKBLUE + msg + bcolors.ENDC)
+
 def print_good(title, msg):
 	if 'QUIET' in os.environ and os.environ['QUIET'] == '1':
 		return	
 	print(bcolors.OKGREEN + '[' + title + '] ' + bcolors.OKGREEN + msg + bcolors.ENDC)	
+
 def print_fail(title, msg):
 	if 'QUIET' in os.environ and os.environ['QUIET'] == '1':
 		return	
 	print(bcolors.HEADER + '[' + title + ']\n' + bcolors.FAIL + msg + bcolors.ENDC)
+
 def print_linking(msg):
 	if 'QUIET' in os.environ and os.environ['QUIET'] == '1':
 		return	
 	print(bcolors.OKBLUE + '[LINKING] ' + bcolors.OKBLUE + msg + bcolors.ENDC)
+
 def print_compiling(msg):
 	if 'QUIET' in os.environ and os.environ['QUIET'] == '1':
 		return	
 	print(bcolors.OKBLUE + '[BUILDING] ' + bcolors.OKBLUE + msg + bcolors.ENDC)
+
 def print_compile_skip(msg):
 	if 'QUIET' in os.environ and os.environ['QUIET'] == '1':
 		return	
 	print(bcolors.OKGREEN + '[OK] ' + bcolors.OKGREEN + msg + bcolors.ENDC)
+
 def print_compile_fail(msg):
 	if 'QUIET' in os.environ and os.environ['QUIET'] == '1':
 		return	
@@ -57,10 +63,11 @@ def transform_opts(opts, envadds):
 	return out
 
 def run(cmdline, stdout=None, stderr=None, comm_timeout=120):
-	print('cmdline', cmdline)
 	if 'MAKE_SHELL_SCRIPT' in os.environ and os.environ['MAKE_SHELL_SCRIPT'] == '1':
 		print(cmdline)
 		return (b'', b'')
+	if 'VERBOSE' in os.environ and os.environ['VERBOSE'] == '1':
+		print(cmdline)
 	proc = subprocess.Popen(cmdline, shell=True, stderr=stderr, stdout=stdout)
 	return proc.communicate(timeout=comm_timeout)
 
@@ -70,11 +77,67 @@ def copyfile(src, dst):
 		return
 	shutil.copyfile(src, dst)
 
-def action_build(copts):
-	if copts.system[0] != 'kernel':
-		print('Only supported system to build is "kernel".')
+def action_csharp_build(copts, sources, output):
+	sources_abs = []
+
+	for src in sources:
+		sources_abs.append(os.path.abspath(src))
+
+	opts = transform_opts(config.SEDNA_CSHARP_COMPILER_OPTS, {
+		'BASE_DIR':	    os.path.abspath('./'),
+		'INPUT': 		' '.join(sources_abs),
+		'OUTPUT': 		output,
+	})
+
+	return run(' '.join(opts), stderr=subprocess.PIPE)
+
+def action_build_sedna(copts):
+	if os.path.exists('./bin') is False:
+		os.makedirs('./bin')
+
+	(outs, errs) = action_csharp_build(copts, config.SEDNA_SOURCES, '${BASE_DIR}/bin/compiler.exe')
+
+	if len(errs) > 0:
+		print_compile_fail(errs.decode('utf8'))
+		print('Build stopped because of errors.')
 		exit(-1)
 
+def action_build_sedna_kernel_module(copts):
+	if os.path.exists('./bin') is False:
+		os.makedirs('./bin')
+
+	# Build sedna kernel module bytecode.
+	opts = ['${BASE_DIR}/bin/compiler.exe', '${BASE_DIR}/bin/main.sbc', '${BASE_DIR}/sedna/main.sn']
+	opts = transform_opts(opts, {
+		'BASE_DIR':	    os.path.abspath('./'),
+	})
+	(outs, errs) = run(' '.join(opts), stderr=subprocess.PIPE)
+	if len(errs) > 0:
+		print_compile_fail(errs.decode('utf8'))
+		print('Build stopped because of errors.')
+		exit(-1)	
+
+	fd = open('./bin/sedna_wrap.asm', 'w')
+	fd.write('BITS 32\n')
+	fd.write('SECTION .sedna\n')
+	fd.write('INCBIN "%s/main.sbc"\n' % os.path.abspath('./bin/'))
+	fd.close()
+
+	# Build sedna kernel module.
+	opts = ['${NASM_BIN}', '-g', '-f', 'elf', '-o', '${BASE_DIR}/bin/ksedna.o', '${BASE_DIR}/bin/sedna_wrap.asm']
+	opts = transform_opts(opts, {
+		'BASE_DIR':	    os.path.abspath('./'),
+	})
+
+	(outs, errs) = run(' '.join(opts), stderr=subprocess.PIPE)
+	if len(errs) > 0:
+		print_compile_fail(errs.decode('utf8'))
+		print('Build stopped because of errors.')
+		exit(-1)	
+
+
+
+def action_build_kernel(copts):
 	if os.path.exists('./bin') is False:
 		os.makedirs('./bin')
 
@@ -82,7 +145,7 @@ def action_build(copts):
 
 	base_dir = os.path.abspath('./')
 
-	for src in config.sources:
+	for src in config.KERNEL_SOURCES:
 		ignore_stderr = False
 
 		if type(src) is dict:
@@ -94,6 +157,10 @@ def action_build(copts):
 		(bsrc, esrc) = os.path.splitext(fsrc)
 
 		(_, src) = os.path.split(fsrc)
+
+		if esrc == '.o':
+			objs.append(fsrc)
+			continue
 
 		fout = os.path.abspath('bin/%s.o' % (src))
 
@@ -126,9 +193,7 @@ def action_build(copts):
 			})
 		else:
 			print('The extension "%s" is unknown for source "%s".' % (esrc, src))
-
-		if 'VERBOSE' in os.environ and os.environ['VERBOSE'] == '1':
-			print(' '.join(opts))
+			exit(-1)
 
 		(outs, errs) = run(' '.join(opts), stderr=subprocess.PIPE)
 		
@@ -143,9 +208,6 @@ def action_build(copts):
 		'INPUT':			' '.join(objs),
 		'OUTPUT':			os.path.abspath('./bin/krnlld.bin'),
 	})
-
-	if 'VERBOSE' in os.environ and os.environ['VERBOSE'] == '1':
-		print(' '.join(opts))
 
 	print_linking('krnlld.bin')
 
@@ -185,7 +247,6 @@ def action_build(copts):
 
 	print_good('RESULT', 'BUILD SUCCESS')
 
-
 def action_run(copts):
 	if copts.system[0] != 'kernel':
 		print('Only supported system to run is "kernel".')
@@ -198,25 +259,66 @@ def action_run(copts):
 		'INPUT':	    	os.path.abspath('./bin/myvaros.iso'),
 	})
 
-	if 'VERBOSE' in os.environ and os.environ['VERBOSE'] == '1':
-		print(' '.join(opts))
-
 	try:
 		run(' '.join(opts), stdout=sys.stdout, stderr=sys.stderr, comm_timeout=None)
 	except:
 		pass
 
+"""
+	The system targets for build operations.
+"""
+systems_build = {
+	'kernel': {
+		'handler': action_build_kernel,
+		'deps': [
+			'sedna_kernel_module',
+		]
+	},
+	'sedna_kernel_module': {
+		'handler': action_build_sedna_kernel_module,
+		'deps': {
+			'sedna_compiler',
+		}
+	},
+	'sedna_compiler': {
+		'handler': action_build_sedna,
+		'deps': [
+		]
+	},
+}
+
+class UnknownTargetSystem(Exception):
+	def __init__(self, sys_name):
+		super().__init__()
+		self.sys_name = sys_name
+
+def action_build(copts, sysname_override=None):
+	if sysname_override is not None:
+		sys_name = sysname_override
+	else:
+		sys_name = copts.system[0]
+		print_risk('BUILDING', sys_name)
+
+	if systems_build.get(sys_name, None) is None:
+		raise UnknownTargetSystem(sys_name)
+
+	cfg = systems_build[sys_name]
+
+	if cfg.get('deps', None) is not None:
+		for dep in cfg['deps']:
+			print_risk('DEP-BUILDING', dep)
+			action_build(copts, dep)
+
+	if cfg.get('handler', None) is not None:
+		cfg['handler'](copts)
+
+	print_good('BUILD', 'completed build of %s' % sys_name)
+
+
 def main(args):
-	if 'NASM_BIN' not in os.environ:
-		os.environ['NASM_BIN'] = config.NASM_BIN
-	if 'LD_BIN' not in os.environ:
-		os.environ['LD_BIN'] = config.LD_BIN
-	if 'GCC_BIN' not in os.environ:
-		os.environ['GCC_BIN'] = config.GCC_BIN
-	if 'ISO_BIN' not in os.environ:
-		os.environ['ISO_BIN'] = config.ISO_BIN
-	if 'QEMU_BIN' not in os.environ:
-		os.environ['QEMU_BIN'] = config.QEMU_I386_BIN
+	for bin_name in config.BIN_PATHS:
+		if bin_name not in os.environ:
+			os.environ[bin_name] = config.BIN_PATHS[bin_name]
 
 	# Read configuration containing the source files.
 	parser = argparse.ArgumentParser(description='Build Coordination')
@@ -243,6 +345,12 @@ def main(args):
 	if copts.action[0] == 'run':
 		action_run(copts)
 
+try:
+	main(sys.argv)
+except UnknownTargetSystem as exc:
+	print('The system "%s" is not known.' % exc.sys_name)
+	syslst = list(systems_build.keys())
+	syslst = ' '.join(syslst)
+	print('Possible values for system are: %s' % syslst)
 
-main(sys.argv)
 

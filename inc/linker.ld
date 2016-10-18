@@ -15,5 +15,9 @@ SECTIONS {
 		*(.bss);
 	}
 
+	.sedna : AT(ADDR(.sedna) - 0xC0000000) {
+		*(.sedna)
+	}
+
 	KERNEL_END_VADDR = .;
 }
