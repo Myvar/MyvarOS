@@ -309,7 +309,7 @@ void kernel_HigherHalf()
     putLog("Irq Installed");
 
     putLog("Installing Memmory");
-    //init_memory_management();   
+    init_memory_management();   
 
     __asm__ __volatile__ ("sti");
     putLog("MyvarOS booted");
