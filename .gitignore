@@ -1,0 +1,6 @@
+/bin/*.o
+/bin/*.bin
+__pycache__
+/sedna/bin/
+/sedna/obj/
+myvaros.iso

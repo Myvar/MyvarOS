@@ -343,6 +343,10 @@ void Test_Sedna() {
     kprintf("end of module\n");
 }
 
+void Test_Panic() {
+    panic("Panic Test");
+}
+
 void Init_Commands()
 {
 
@@ -364,4 +368,7 @@ void Init_Commands()
     Shell_Registor_Command("cdreadtest", "Test reading CD-ROM", Test_CDRead);
 
     Shell_Registor_Command("tsedna", "Sedna testing command", Test_Sedna);
+
+    Shell_Registor_Command("panic", "Panic the kernel", Test_Panic);
+    
 }
