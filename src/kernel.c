@@ -319,6 +319,7 @@ void kernel_HigherHalf()
 
     putLog("Starting Shell");
     Shell_Init();
+    
 
     while (1 == 1)
     {

@@ -62,13 +62,13 @@ def transform_opts(opts, envadds):
 
 	return out
 
-def run(cmdline, stdout=None, stderr=None, comm_timeout=120):
+def run(cmdline, stdout=None, stderr=None, comm_timeout=120, cwd=None):
 	if 'MAKE_SHELL_SCRIPT' in os.environ and os.environ['MAKE_SHELL_SCRIPT'] == '1':
 		print(cmdline)
 		return (b'', b'')
 	if 'VERBOSE' in os.environ and os.environ['VERBOSE'] == '1':
 		print(cmdline)
-	proc = subprocess.Popen(cmdline, shell=True, stderr=stderr, stdout=stdout)
+	proc = subprocess.Popen(cmdline, shell=True, stderr=stderr, stdout=stdout, cwd=cwd)
 	return proc.communicate(timeout=comm_timeout)
 
 def copyfile(src, dst):
@@ -91,7 +91,29 @@ def action_csharp_build(copts, sources, output):
 
 	return run(' '.join(opts), stderr=subprocess.PIPE)
 
-def action_build_sedna(copts):
+def have_dotnet_core():
+	(outs, errs) = run('dotnet --version', stderr=subprocess.PIPE)
+	if len(errs) > 0:
+		return False
+	else:
+		return True
+
+def action_build_sedna_compiler_dotnet(copts):
+	if os.path.exists('./bin') is False:
+		os.makedirs('./bin')
+
+	base_dir = os.path.abspath('./')
+
+	(outs, errs) = run('dotnet build', stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, cwd='%s/sedna/' % base_dir)
+
+	# TODO: This is incomplete, but it is also currently not used.
+
+	if len(errs) > 0:
+		print_compile_fail(errs.decode('utf8'))
+		print('Build stopped because of errors.')
+		exit(-1)
+
+def action_build_sedna_compiler_mono(copts):
 	if os.path.exists('./bin') is False:
 		os.makedirs('./bin')
 
@@ -102,16 +124,43 @@ def action_build_sedna(copts):
 		print('Build stopped because of errors.')
 		exit(-1)
 
+def action_build_sedna_compiler(copts):
+	if not have_dotnet_core():
+		print_fail('DOTNET', 'execution of `dotnet` failed; failing back to mono')
+		action_build_sedna_compiler_mono(copts)
+
 def action_build_sedna_kernel_module(copts):
 	if os.path.exists('./bin') is False:
 		os.makedirs('./bin')
 
-	# Build sedna kernel module bytecode.
-	opts = ['${BASE_DIR}/bin/compiler.exe', '${BASE_DIR}/bin/main.sbc', '${BASE_DIR}/sedna/main.sn']
-	opts = transform_opts(opts, {
-		'BASE_DIR':	    os.path.abspath('./'),
-	})
-	(outs, errs) = run(' '.join(opts), stderr=subprocess.PIPE)
+	if have_dotnet_core():
+		print_risk('USING', 'dotnet built compiler')
+		opts = ['dotnet', 'restore']
+		opts = transform_opts(opts, {
+			'BASE_DIR':	    os.path.abspath('./'),
+		})		
+		(outs, errs) = run(' '.join(opts), stderr=subprocess.PIPE, cwd='%s/sedna/' % os.path.abspath('./'))
+
+		if len(errs) > 0:
+			print_compile_fail(errs.decode('utf8'))
+			print('Build stopped because of errors from `dotnet restore`. Try setting VERBOSE=1.')
+			exit(-1)	
+
+		opts = ['dotnet', 'run', '${BASE_DIR}/bin/main.sbc', '${BASE_DIR}/sedna/main.sn']
+		opts = transform_opts(opts, {
+			'BASE_DIR':	    os.path.abspath('./'),
+		})		
+		(outs, errs) = run(' '.join(opts), stderr=subprocess.PIPE, cwd='%s/sedna/' % os.path.abspath('./'))
+	else:
+		print_risk('USING', 'mono built compiler')
+		# Build sedna kernel module bytecode.
+		opts = ['${BASE_DIR}/bin/compiler.exe', '${BASE_DIR}/bin/main.sbc', '${BASE_DIR}/sedna/main.sn']
+		opts = transform_opts(opts, {
+			'BASE_DIR':	    os.path.abspath('./'),
+		})
+		(outs, errs) = run(' '.join(opts), stderr=subprocess.PIPE)
+
+
 	if len(errs) > 0:
 		print_compile_fail(errs.decode('utf8'))
 		print('Build stopped because of errors.')
@@ -281,7 +330,7 @@ systems_build = {
 		}
 	},
 	'sedna_compiler': {
-		'handler': action_build_sedna,
+		'handler': action_build_sedna_compiler,
 		'deps': [
 		]
 	},

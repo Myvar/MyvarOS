@@ -1,4 +1,5 @@
 imports System
+imports Kernel
 
 scope MyvarOS
 
@@ -7,6 +8,6 @@ type Program
     @entry
     fn Main() 
     {       
-        puts("Test Program");       
+        puts("Main");       
     }
 }
