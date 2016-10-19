@@ -1,5 +1,6 @@
-#include <main.h>
-#include <heap.h>
+#include <stdarg.h>
+#include "main.h"
+#include "heap.h"
 
 extern unsigned int   MultibootInfo_Structure;
 extern unsigned int   Inte801Ax;
@@ -49,7 +50,15 @@ typedef struct _MBINFO MBINFO;
 KHEAPBM g_k_heap;
 
 void* kmalloc(unsigned int size) {
-    return k_heapBMAlloc(&g_k_heap, size);
+    void *tmp;
+
+    // A quick sanity check to help with debugging.
+    tmp = k_heapBMAlloc(&g_k_heap, size);
+    if (tmp == 0) {
+        panic("kmalloc OOM");
+    }    
+
+    return tmp;
 }
 
 void kfree(void *ptr) {
@@ -284,6 +293,80 @@ void kernel_main(unsigned int boot_ref_addr)
     ((unsigned int*)(boot_ref_addr + ((unsigned int)&KERNEL_START_ADDR - (unsigned int)&KERNEL_START_VADDR)))[0] = boot_ref_addr;
 
     Init_Paging();
+}
+
+void panic(char *msg) {
+    puts("PANIC: ");
+    puts(msg);
+    puts("\n");
+    for (;;);
+}
+
+const char *itoh_map = "0123456789ABCDEF";
+
+char* itoh(int i, char *buf)
+{
+  int   n;
+  int   b;
+  int   z;
+  int   s;
+  
+  if (sizeof(void*) == 4)
+    s = 8;
+  if (sizeof(void*) == 8)
+    s = 16;
+  
+  for (z = 0, n = (s - 1); n > -1; --n)
+  {
+    b = (i >> (n * 4)) & 0xf;
+    buf[z] = itoh_map[b];
+    ++z;
+  }
+  buf[z] = 0;
+  return buf;
+}
+
+
+void kprintf(const char *fmt, ...)
+{
+  const char  *p;
+  va_list   argp;
+  int     i;
+  char    *s;
+  char    fmtbuf[256];
+
+  va_start(argp, fmt);
+
+  for(p = fmt; *p != '\0'; p++)
+  {
+    //kputc('w');
+    if(*p != '%')
+    {
+      putc(*p);
+      continue;
+    }
+
+    switch(*++p)
+      {
+      case 'c':
+        i = va_arg(argp, int);
+        putc(i);
+        break;
+      case 's':
+        s = va_arg(argp, char *);
+        puts(s);
+        break;
+      case 'x':
+        i = va_arg(argp, int);
+        s = itoh(i, fmtbuf);
+        puts(s);
+        break;
+      case '%':
+        putc('%');
+        break;
+    }
+  }
+  va_end(argp);
 }
 
 void kernel_HigherHalf()

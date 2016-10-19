@@ -70,8 +70,10 @@ extern void Init_Commands();
 
 extern void Init_Paging();
 
-extern void* kmalloc(unsigned int size);
-extern void kfree(void *ptr);
+void* kmalloc(unsigned int size);
+void kfree(void *ptr);
+void panic(char *msg);
+void kprintf(const char *fmt, ...);
 
 
 extern void dump_atapi_data(unsigned short channel);

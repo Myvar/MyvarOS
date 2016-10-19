@@ -1,4 +1,5 @@
-#include <main.h>
+#include <stdint.h>
+#include "main.h"
 #include "irq.h"
 
 
@@ -118,160 +119,229 @@ void PutString(char *s, int lenght )
 
 }
 
-unsigned int            SednaStart;
-void Test_Sedna()
-{
-    char *s = (char*)&SednaStart;
+#define READ_SEDNA_INT(base, byte_offset) *((int32_t*)(base + byte_offset))
+typedef uint8_t SEDNA_OP_WORD;
+typedef int32_t SEDNA_INT;
 
-    char buf[255];
+typedef struct {
+    uint8_t             *name;
+    uint16_t            param_cnt;
+    uint8_t             **param_type;
+    uint32_t            op_cnt;
+    uint32_t            bytecode_sz;
+    uint8_t             *bytecode;
+} SEDNAMETHOD;
 
-    int offset = 0;
+typedef struct {
+    uint8_t             *scope;
+    uint32_t            import_cnt;
+    uint8_t             **import;
+    uint32_t            type_cnt;
+    uint8_t             **type;
+    uint8_t             **type_base;
+    uint32_t            method_cnt;
+    SEDNAMETHOD         *method;
+} SEDNAMODULE;
 
-    offset += 4;
+/*
+    Copies a string value specified by offset and length into a newly allocated
+    string sequence terminated by a null byte.
+*/
+static uint8_t *alloc_null_terminated_string(void *offset, uintptr_t size) {
+    uint8_t *out;
 
-    puts("Scope:\n");
-    PutString((char*)&SednaStart + offset, ((int*)s)[0]);  
-    puts("\n");puts("\n"); 
-    
-    offset += (s)[0];
-
-    int total_Imports = (s)[offset];
-
-    itoa(total_Imports, 10, buf);
-    puts("Total Imports: ");
-    puts(buf);
-    puts("\n"); 
-
-    offset += 4;
-
-    int index = 0;
-    for(index = 0; index < total_Imports; index++)
-    {   puts("Imports: ");
-        int l = (s)[offset];
-        offset += 4;
-        PutString((char*)&SednaStart + offset, l);  
-        puts("\n"); 
-
-        offset += l;
-
-    }
-    puts("\n");
-
-    int total_Types = (s)[offset];
-
-    itoa(total_Types, 10, buf);
-    puts("Total Types: ");
-    puts(buf);
-    puts("\n"); 
-
-    offset += 4;
-
-    index = 0;
-    for(index = 0; index < total_Types; index++)
-    {   puts("Type: ");
-        int l = (s)[offset];
-        offset += 4;
-        PutString((char*)&SednaStart + offset, l);  
-        puts("\n"); 
-
-        offset += l;
-
-        puts("Class bace type: ");
-        l = (s)[offset];
-        offset += 4;
-        PutString((char*)&SednaStart + offset, l);
-        if(l == 0)
-        {
-            puts("none");
-        }  
-        puts("\n"); 
-
-        offset += l;
+    if (size == 0) {
+        // The most safe action, but not that efficient.
+        out = (uint8_t*)kmalloc(1);
+        *out = 0;
+        return out;
     }
 
-
-    puts("\n");
-
-    int total_fns= (s)[offset];
-
-    itoa(total_fns, 10, buf);
-    puts("Total Methods: ");
-    puts(buf);
-    puts("\n"); 
-
-    offset += 4;
-
-    index = 0;
-    for(index = 0; index < total_fns; index++)
-    {   puts("Method Name: ");
-        int l = (s)[offset];
-        offset += 4;
-        PutString((char*)&SednaStart + offset, l);  
-        puts("\n"); 
-
-        offset += l;
-
-        int total_para= (s)[offset];
-
-        itoa(total_para, 10, buf);
-        puts("Total Parameters: ");
-        puts(buf);
-        puts("\n"); 
-
-        offset += 4;
-
-        int x = 0;
-        for(x = 0; x < total_para; x++)
-        {
-            puts("Parameter Type: ");
-            int l = (s)[offset];
-            offset += 4;
-            PutString((char*)&SednaStart + offset, l);  
-            puts("\n"); 
-
-            offset += l;
+    if (*((uint8_t*)offset + size - 1) == 0) {
+        out = (uint8_t*)kmalloc(size);
+        if (out == 0) {
+            panic("alloc_null_terminated_string OOM");
         }
-puts("\n"); 
-        int total_ops = (s)[offset];
-
-        itoa(total_ops, 10, buf);
-        puts("Total Opcodes: ");
-        puts(buf);
-        puts("\n"); 
-        offset += 4;
-
-        for(x = 0; x < total_ops; x++)
-        {
-            if(s[offset] == 0x20)
-            {
-                puts("LoadStr: \"");
-                offset++;
-                int l = (s)[offset];
-                offset += 4;
-                PutString((char*)&SednaStart + offset, l);  
-                puts("\"\n"); 
-
-                offset += l;
-
-            }
-            if(s[offset] == 0x30)
-            {
-                puts("Call: \"");
-                offset++;
-                int l = (s)[offset];
-                offset += 4;
-                PutString((char*)&SednaStart + offset, l);  
-                puts("\"\n"); 
-
-                offset += l;
-
-            }
+        memcpy(out, offset, size);
+    } else {
+        out = (uint8_t*)kmalloc(size + 1);
+        if (out == 0) {
+            panic("alloc_null_terminated_string OOM");
         }
-
+        memcpy(out, offset, size);
+        out[size] = 0;
     }
+
+    return out;
 }
 
+extern uint8_t KERNEL_START_VADDR;
 
+SEDNAMODULE* sedna_load_module(uintptr_t address)
+{
+    SEDNAMODULE     *mod;
+    SEDNAMETHOD     *meth;
+    int32_t         sz;
+    int32_t         index;
+    uint32_t        offset;
+    int32_t         x;
+
+    mod = kmalloc(sizeof(SEDNAMODULE));
+
+    sz = READ_SEDNA_INT(address, 0);
+    offset += sizeof(SEDNA_INT);
+
+    //kprintf("scope-address: %x scope-length: %x", (uintptr_t)address + offset, sz);
+    mod->scope = alloc_null_terminated_string((uint8_t*)address + offset, sz);
+    offset += sz;
+
+    //kprintf(" scope: %s\n", mod->scope);
+
+
+    int32_t total_imports = READ_SEDNA_INT(address, offset);
+    offset += sizeof(SEDNA_INT);
+
+    //kprintf("total-imports: %x\n", total_imports);
+
+    mod->import_cnt = total_imports;
+    mod->import = (uint8_t**)kmalloc(sizeof(uint8_t*) * mod->import_cnt);
+
+    for(index = 0; index < total_imports; index++)
+    {   
+        sz = READ_SEDNA_INT(address, offset);
+        offset += sizeof(SEDNA_INT);
+        mod->import[index] = alloc_null_terminated_string((uint8_t*)address + offset, sz);
+        offset += sz;
+
+        //kprintf("import-address: %x import-size: %x import: %s\n", (uintptr_t)address + offset, sz, mod->import[index]);
+    }
+
+    char *s;
+    char buf[20];
+
+    int32_t total_types = READ_SEDNA_INT(address, offset);
+    offset += sizeof(SEDNA_INT);
+
+    mod->type_cnt = total_types;
+    mod->type = (uint8_t**)kmalloc(sizeof(uint8_t*) * mod->type_cnt);
+    mod->type_base = (uint8_t**)kmalloc(sizeof(uint8_t*) * mod->type_cnt);
+
+    for(index = 0; index < total_types; index++)
+    {   
+        sz = READ_SEDNA_INT(address, offset);
+        offset += sizeof(SEDNA_INT);
+        mod->type[index] = alloc_null_terminated_string((uint8_t*)address + offset, sz);
+        offset += sz;
+
+        sz = READ_SEDNA_INT(address, offset);
+        offset += sizeof(SEDNA_INT);
+        mod->type_base[index] = alloc_null_terminated_string((uint8_t*)address + offset, sz);
+        offset += sz;
+
+        //kprintf("type: %s base: %s\n", mod->type[index], mod->type_base[index]);
+    }
+
+
+    int32_t total_fns = READ_SEDNA_INT(address, offset);
+    offset += sizeof(SEDNA_INT);
+
+    mod->method_cnt = total_fns;
+    mod->method = (SEDNAMETHOD*)kmalloc(sizeof(SEDNAMETHOD) * mod->method_cnt);
+
+    for(index = 0; index < total_fns; index++)
+    {   
+        // Method name.
+        sz = READ_SEDNA_INT(address, offset);
+        offset += sizeof(SEDNA_INT);
+        mod->method[index].name = alloc_null_terminated_string((uint8_t*)address + offset, sz);
+        offset += sz;
+
+        int32_t total_para = READ_SEDNA_INT(address, offset);
+        offset += sizeof(SEDNA_INT);
+
+        mod->method[index].param_cnt = total_para;
+        mod->method[index].param_type = (uint8_t**)kmalloc(sizeof(uint8_t*) * mod->method[index].param_cnt);
+
+        //kprintf("method: %s parameter-count: %x\n", mod->method[index].name, mod->method[index].param_cnt);
+
+        for(x = 0; x < total_para; x++)
+        {
+            sz = READ_SEDNA_INT(address, offset);
+            offset += sizeof(SEDNA_INT);
+            mod->method[index].param_type[x] = alloc_null_terminated_string((uint8_t*)address + offset, sz);
+            //kprintf("   method-parameter-type: %s\n", mod->method[index].param_type[x]);
+            offset += sz;
+        }
+        
+        // This was added to keep from interpreting the bytecode
+        // at this very moment.
+        SEDNA_INT bytecode_sz = READ_SEDNA_INT(address, offset);
+        offset += sizeof(SEDNA_INT);
+
+        SEDNA_INT op_cnt = READ_SEDNA_INT(address, offset);
+        offset += sizeof(SEDNA_INT);
+
+        //kprintf("   op-count: %x bytecode-sz: %x\n", op_cnt, bytecode_sz);
+
+        mod->method[index].op_cnt = op_cnt;
+        mod->method[index].bytecode_sz = bytecode_sz;
+        mod->method[index].bytecode = kmalloc(bytecode_sz);
+        memcpy(mod->method[index].bytecode, (uint8_t*)(address + offset), bytecode_sz);
+    }
+
+    return mod;
+}
+
+unsigned int            SednaStart;
+
+void Test_Sedna() {
+    SEDNAMODULE *mod;
+    int32_t x;
+    int32_t y;
+
+    /*
+        Use specialized function for loading a Sedna module. The
+        `mod` variable is a pointer to an allocated object in the
+        heap. This allows anything located at the address to be
+        removed afterwards if fully loaded into the SEDNAMODULE
+        object above.
+    */
+    mod = sedna_load_module((uintptr_t)&SednaStart);
+
+    kprintf("mod-scope-name: %s\n", mod->scope);
+    kprintf(" import-count: %x type-count: %x method-count: %x\n",
+        mod->import_cnt,
+        mod->type_cnt,
+        mod->method_cnt
+    );
+
+    for (x = 0; x < mod->import_cnt; ++x) {
+        kprintf(" import[%x]: %s\n", x, mod->import[x]);
+    }
+
+    for (x = 0; x < mod->type_cnt; ++x) {
+        kprintf(" type[%x]: %s base: %s\n", 
+            x,
+            mod->type[x], mod->type_base[x]
+        );
+    }
+
+    for (x = 0; x < mod->method_cnt; ++x) {
+        kprintf(" method[%x]: %s param-count: %x op-count: %x bytecode-sz: %x\n",
+            x,
+            mod->method[x].name,
+            mod->method[x].param_cnt,
+            mod->method[x].op_cnt,
+            mod->method[x].bytecode_sz
+        );
+
+        for (y = 0; y < mod->method[x].param_cnt; ++y) {
+            kprintf("  param-type[%x]: %s\n", y, mod->method[x].param_type[y]);
+        }
+    }
+
+    kprintf("end of module\n");
+}
 
 void Init_Commands()
 {
