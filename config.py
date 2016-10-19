@@ -115,5 +115,6 @@ KERNEL_SOURCES = [
 	'src/idt.asm',
 	'src/isrs.asm',
 	'src/irq.asm',
+	'src/sedna/sedna.c',	
 	'bin/ksedna.o',
 ]
