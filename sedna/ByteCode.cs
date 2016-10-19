@@ -10,6 +10,7 @@ namespace Sedna.Core
     public class ByteCode
     {
         List<byte> _Buf = new List<byte>();
+        int bc_count = 0;
 
         public void Emit(List<IAst> ast)
         {
@@ -93,6 +94,8 @@ namespace Sedna.Core
                     AllowWrite = false;
                     int count = 0;
 
+                    int start_byte_count = bc_count;
+
                     foreach(var stmts in method.Body)
                     {
                         Emit(stmts, ref count);
@@ -100,6 +103,14 @@ namespace Sedna.Core
 
                     //Write actuale byte code
                     AllowWrite = true;                    
+
+                    // Write the total bytes of "bytecode". This
+                    // is to help with reading the module without
+                    // parsing/interpreting the bytecode until 
+                    // later. It also abstracts away the need for
+                    // the loader to understand the bytecode.
+                    // -kmcg
+                    WriteInt(bc_count - start_byte_count);
 
                     WriteInt(count);
                     count = 0;
@@ -159,6 +170,8 @@ namespace Sedna.Core
 
         public void WriteString(string s)
         {
+            bc_count += 4 + Encoding.ASCII.GetByteCount(s);
+
             if(!AllowWrite)
             {
                 return;
@@ -170,6 +183,8 @@ namespace Sedna.Core
 
         public void WriteInt(int i)
         {
+            bc_count += 4;
+
             if(!AllowWrite)
             {
                 return;
@@ -180,6 +195,8 @@ namespace Sedna.Core
 
         public void WriteByte(byte b)
         {
+            bc_count += 1;
+
             if(!AllowWrite)
             {
                 return;

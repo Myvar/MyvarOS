@@ -7,26 +7,22 @@ SECTIONS {
 	KERNEL_START_VADDR = .;
 
 	.text : AT(ADDR(.text) - 0xC0000000) {
-		*(.text);
-	}
-		
-	. = ALIGN(0x1000);
-	.bss : AT(ADDR(.bss) - 0xC0000000) {
-		*(.bss);
+		*(.text*);
 	}
 
 	.data : AT(ADDR(.data) - 0xC0000000) {
-		*(.data);
+		*(.data*);
 	}
 
 	.rodata : AT(ADDR(.rodata) - 0xC0000000) {
-		*(.rodata);
+		*(.rodata*);
+		SednaStart = .;
+		*(.sedna*);
 	}
 
-	SednaStart = .;
-
-	.sedna : AT(ADDR(.sedna) - 0xC0000000) {
-		*(.sedna);
+	. = ALIGN(0x1000);
+	.bss : AT(ADDR(.bss) - 0xC0000000) {
+		*(.bss*);
 	}
 
 	KERNEL_END_VADDR = .;
