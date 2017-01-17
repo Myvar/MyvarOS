@@ -15,6 +15,8 @@ extern void Terminal_Set_Y(int c);
 
 extern char inportb (short _port);
 extern void outportb (short _port, char _data);
+extern void outportsm(unsigned short port, unsigned char * data, unsigned long size);
+extern void inportsm(unsigned short port, unsigned char * data, unsigned long size);
 
 extern void Serial_Init();
 extern char Read_Serial();
@@ -65,6 +67,8 @@ extern void strappend(char* s, char c);
 extern void strremovelast(char* s);
 extern char ** strsplit(char* a_str, char a_delim);
 extern char *strclamp(char *str);
+extern char * strremovefirst(char *s);
+extern char *strtok_once(char *s, char *delm);
 
 extern void Init_Commands();
 
@@ -79,3 +83,10 @@ void kprintf(const char *fmt, ...);
 extern void dump_atapi_data(unsigned short channel);
 extern int atapi_irq_hook(struct regs *r);
 extern void atapi_read(unsigned short channel, unsigned char slave);
+
+extern void ide_init(unsigned short bus);
+extern void ide_read_sector(unsigned short bus, unsigned char slave, unsigned int lba, unsigned char * buf);
+extern void ide_write_sector(unsigned short bus, unsigned char slave, unsigned int lba, unsigned char * buf);
+extern void ide_write_sector_retry(unsigned short bus, unsigned char slave, unsigned int lba, unsigned char * buf);
+
+

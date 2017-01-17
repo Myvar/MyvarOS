@@ -17,6 +17,7 @@ KERNEL_QEMU_OPTS = [
 	'-m', '4G',
 	'-cdrom', '${INPUT}',
 	'-serial', 'tcp:127.0.0.1:4444,server${QEMU_SERIAL_DEBUG_NOWAIT}',
+	'-hda', 'test.vmdk'
 ]
 
 KERNEL_ISO_OPTS = [
@@ -116,5 +117,8 @@ KERNEL_SOURCES = [
 	'src/isrs.asm',
 	'src/irq.asm',
 	'src/sedna/sedna.c',	
+	'src/sedna/Sinterpiter.c',	
+	'src/sedna/SednaSystemCalls.c',	
 	'bin/ksedna.o',
+	'src/drivers/ata.c',
 ]

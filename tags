@@ -1,0 +1,51 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+BIN_PATHS	config.py	/^BIN_PATHS = {$/;"	kind:variable	line:6
+BOLD	build.py	/^    BOLD = '\\033[1m'$/;"	kind:variable	line:16
+ENDC	build.py	/^    ENDC = '\\033[0m'$/;"	kind:variable	line:15
+FAIL	build.py	/^    FAIL = '\\033[91m'$/;"	kind:variable	line:14
+GCC_OPTS	config.py	/^GCC_OPTS = [$/;"	kind:variable	line:44
+HEADER	build.py	/^    HEADER = '\\033[95m'$/;"	kind:variable	line:10
+KERNEL_ISO_OPTS	config.py	/^KERNEL_ISO_OPTS = [$/;"	kind:variable	line:23
+KERNEL_QEMU_OPTS	config.py	/^KERNEL_QEMU_OPTS = [$/;"	kind:variable	line:15
+KERNEL_SOURCES	config.py	/^KERNEL_SOURCES = [$/;"	kind:variable	line:99
+LD_OPTS	config.py	/^LD_OPTS = [$/;"	kind:variable	line:36
+NASM_OPTS	config.py	/^NASM_OPTS = [$/;"	kind:variable	line:68
+OKBLUE	build.py	/^    OKBLUE = '\\033[94m'$/;"	kind:variable	line:11
+OKGREEN	build.py	/^    OKGREEN = '\\033[92m'$/;"	kind:variable	line:12
+SEDNA_CSHARP_COMPILER_OPTS	config.py	/^SEDNA_CSHARP_COMPILER_OPTS = [$/;"	kind:variable	line:62
+SEDNA_SOURCES	config.py	/^SEDNA_SOURCES = [$/;"	kind:variable	line:76
+UNDERLINE	build.py	/^    UNDERLINE = '\\033[4m'$/;"	kind:variable	line:17
+UnknownTargetSystem	build.py	/^class UnknownTargetSystem(Exception):$/;"	kind:class	line:339
+WARNING	build.py	/^    WARNING = '\\033[93m'$/;"	kind:variable	line:13
+__init__	build.py	/^	def __init__(self, sys_name):$/;"	kind:member	line:340
+action_build	build.py	/^def action_build(copts, sysname_override=None):$/;"	kind:function	line:344
+action_build_kernel	build.py	/^def action_build_kernel(copts):$/;"	kind:function	line:189
+action_build_sedna_compiler	build.py	/^def action_build_sedna_compiler(copts):$/;"	kind:function	line:127
+action_build_sedna_compiler_dotnet	build.py	/^def action_build_sedna_compiler_dotnet(copts):$/;"	kind:function	line:101
+action_build_sedna_compiler_mono	build.py	/^def action_build_sedna_compiler_mono(copts):$/;"	kind:function	line:116
+action_build_sedna_kernel_module	build.py	/^def action_build_sedna_kernel_module(copts):$/;"	kind:function	line:132
+action_csharp_build	build.py	/^def action_csharp_build(copts, sources, output):$/;"	kind:function	line:80
+action_run	build.py	/^def action_run(copts):$/;"	kind:function	line:299
+bcolors	build.py	/^class bcolors:$/;"	kind:class	line:9
+build.py	build.py	1;"	kind:file	line:1
+config.py	config.py	1;"	kind:file	line:1
+copyfile	build.py	/^def copyfile(src, dst):$/;"	kind:function	line:74
+have_dotnet_core	build.py	/^def have_dotnet_core():$/;"	kind:function	line:94
+main	build.py	/^def main(args):$/;"	kind:function	line:367
+print_compile_fail	build.py	/^def print_compile_fail(msg):$/;"	kind:function	line:49
+print_compile_skip	build.py	/^def print_compile_skip(msg):$/;"	kind:function	line:44
+print_compiling	build.py	/^def print_compiling(msg):$/;"	kind:function	line:39
+print_fail	build.py	/^def print_fail(title, msg):$/;"	kind:function	line:29
+print_good	build.py	/^def print_good(title, msg):$/;"	kind:function	line:24
+print_linking	build.py	/^def print_linking(msg):$/;"	kind:function	line:34
+print_risk	build.py	/^def print_risk(title, msg):$/;"	kind:function	line:19
+run	build.py	/^def run(cmdline, stdout=None, stderr=None, comm_timeout=120, cwd=None):$/;"	kind:function	line:65
+syslst	build.py	/^	syslst = ' '.join(syslst)$/;"	kind:variable	line:402
+syslst	build.py	/^	syslst = list(systems_build.keys())$/;"	kind:variable	line:401
+systems_build	build.py	/^systems_build = {$/;"	kind:variable	line:319
+transform_opts	build.py	/^def transform_opts(opts, envadds):$/;"	kind:function	line:54

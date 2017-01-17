@@ -3,14 +3,16 @@
 int strlen(const char *str)
 {
     int retval;
-    for(retval = 0; *str != '\0'; str++) retval++;
+    for (retval = 0; *str != '\0'; str++)
+        retval++;
     return retval;
 }
 
 char *strcpy(char *s1, const char *s2)
 {
     char *s1_p = s1;
-    while ((*s1++ = *s2++));
+    while ((*s1++ = *s2++))
+        ;
     return s1_p;
 }
 
@@ -23,23 +25,51 @@ char *strcpyc(char *s1, char s2)
 
 int strcmp(char *a, char *b)
 {
-    while (*a && *b && *a == *b) { ++a; ++b; }
+    while (*a && *b && *a == *b)
+    {
+        ++a;
+        ++b;
+    }
     return *a - *b;
 }
 
-void strappend(char* s, char c)
+void strappend(char *s, char c)
 {
 
     int len = strlen(s);
     s[len] = c;
-    s[len+1] = '\0';
+    s[len + 1] = '\0';
 }
 
-void strremovelast(char* s)
+void strremovelast(char *s)
 {
 
     int len = strlen(s);
     s[len - 1] = '\0';
+}
+
+char * strremovefirst(char *s)
+{
+    int len = strlen(s);
+    char * re = kmalloc(len - 1);
+    int i = 0;
+    for (int i = 1; i < len; i++)
+    {
+        re[i - 1] = s[i];
+    }
+    return re;
+}
+
+char * strremovefirstCount(char *s, int c)
+{
+    int len = strlen(s);
+    char * re = kmalloc(len - c);
+    int i = 0;
+    for (int i = c; i < len; i++)
+    {
+        re[i - c] = s[i];
+    }
+    return re;
 }
 
 char *strclamp(char *str)
@@ -66,12 +96,12 @@ char *strdup(const char *str)
     return result;
 }
 
-char* strtok(char* s, char* delm)
+char *strtok_once(char *s, char *delm)
 {
-    static int currIndex = 0;
-    if(!s || !delm || s[currIndex] == '\0')
-    return -1;
-    char *W = (char *)kmalloc(sizeof(char)*100);
+    int currIndex = 0;
+    if (!s || !delm || s[currIndex] == '\0')
+        return -1;
+    char *W = (char *)kmalloc(sizeof(char) * 100);
     int i = currIndex, k = 0, j = 0;
     //char *ptr;
     //static char *Iterator = s;
@@ -80,12 +110,15 @@ char* strtok(char* s, char* delm)
     /*if (s == NULL){
     s = Iterator;
     }*/
-    while (s[i] != '\0'){
+    while (s[i] != '\0')
+    {
         j = 0;
-        while (delm[j] != '\0'){
+        while (delm[j] != '\0')
+        {
             if (s[i] != delm[j])
                 W[k] = s[i];
-            else goto It;
+            else
+                goto It;
             j++;
         }
         //ptr++;
@@ -94,17 +127,53 @@ char* strtok(char* s, char* delm)
     }
 It:
     W[i] = 0;
-    currIndex = i+1;
+    currIndex = i + 1;
     //Iterator = ++ptr;
     return W;
 }
 
-char ** strsplit(char* a_str, char a_delim)
+char *strtok(char *s, char *delm)
 {
-    char** result    = 0;
-    int count     = 0;
-    char* tmp        = a_str;
-    char* last_comma = 0;
+    static int currIndex = 0;
+    if (!s || !delm || s[currIndex] == '\0')
+        return -1;
+    char *W = (char *)kmalloc(sizeof(char) * 100);
+    int i = currIndex, k = 0, j = 0;
+    //char *ptr;
+    //static char *Iterator = s;
+    //ptr = s;
+
+    /*if (s == NULL){
+    s = Iterator;
+    }*/
+    while (s[i] != '\0')
+    {
+        j = 0;
+        while (delm[j] != '\0')
+        {
+            if (s[i] != delm[j])
+                W[k] = s[i];
+            else
+                goto It;
+            j++;
+        }
+        //ptr++;
+        i++;
+        k++;
+    }
+It:
+    W[i] = 0;
+    currIndex = i + 1;
+    //Iterator = ++ptr;
+    return W;
+}
+
+char **strsplit(char *a_str, char a_delim)
+{
+    char **result = 0;
+    int count = 0;
+    char *tmp = a_str;
+    char *last_comma = 0;
     char delim[2];
     delim[0] = a_delim;
     delim[1] = 0;
@@ -127,12 +196,12 @@ char ** strsplit(char* a_str, char a_delim)
        knows where the list of returned strings ends. */
     count++;
 
-    result = kmalloc(sizeof(char*) * count);
+    result = kmalloc(sizeof(char *) * count);
 
     if (result)
     {
-        int idx  = 0;
-        char* token = strtok(a_str, delim);
+        int idx = 0;
+        char *token = strtok(a_str, delim);
 
         while (token)
         {

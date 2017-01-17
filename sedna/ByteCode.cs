@@ -149,16 +149,21 @@ namespace Sedna.Core
                 {
                     count++;
                     WriteByte(0x20);//loadstr opcode
-                    WriteString(x.Value.Trim().Trim('"'));
+                    WriteString(EscapeLiternals(x.Value.Trim().Trim('"')));
                     return;
                 }
             }
         }
 
+        private string EscapeLiternals(string s)
+        {
+            return s.Replace("\\n", "\n");
+        }
+
         public string ResolveCall(string s)
         {
             //hardcode for now
-            return "[kernel]stdio::" + s;
+            return "[Kernel]stdio::" + s;
         }
 
         public void Write(string file)

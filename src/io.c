@@ -11,3 +11,11 @@ void outportb (short _port, char _data)
 } 
 
 
+void outportsm(unsigned short port, unsigned char * data, unsigned long size) {
+	asm volatile ("rep outsw" : "+S" (data), "+c" (size) : "d" (port));
+}
+
+
+void inportsm(unsigned short port, unsigned char * data, unsigned long size) {
+	asm volatile ("rep insw" : "+D" (data), "+c" (size) : "d" (port) : "memory");
+}

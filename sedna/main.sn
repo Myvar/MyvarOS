@@ -8,6 +8,8 @@ type Program
     @entry
     fn Main() 
     {       
-        puts("Main");       
+        puts("Look Kevin\nI am sedna code talking to you\n");
+        puts("bye\n");
+        puts("bye\n");
     }
 }
