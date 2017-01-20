@@ -161,6 +161,23 @@ namespace Sedna.Core
                 count++;
                 WriteByte(0x41);
             }
+
+            if (Opcode is AssignStmt)
+            {
+                var x = Opcode as AssignStmt;
+              
+                
+
+                EmitParameter(x.Value, ref count);
+
+                count++;
+                WriteByte(0x21);//load int
+                WriteInt(variables.IndexOf(x.Name));
+
+                //load the value into the local variable
+                count++;
+                WriteByte(0x41);
+            }
         }
 
         public void EmitParameter(IAst Opcode, ref int count)

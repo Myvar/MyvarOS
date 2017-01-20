@@ -24,6 +24,7 @@ namespace Sedna.Core.Internals
             new WhenStmt(),
             new InvokeStmt(),
             new ExpressionStmt(),
+            new AssignStmt(),
 
             /* Must always be last becuse isvalid logic is a littlbit fuzzy */
             new ResolveStmt()

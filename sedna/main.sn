@@ -9,6 +9,12 @@ type Program
     fn Main() 
     {            
         dec name : str = "Kevin";
-        puts("Welcome " + name + " to MyvarOS");
+        dec osName = "MyvarOS";
+
+        puts("Welcome " + name + " to " + osName + "\n");
+
+        osName = "The Best OS Ever";
+        puts("Welcome " + name + " to " + osName + "\n");
+        
     }
 }
