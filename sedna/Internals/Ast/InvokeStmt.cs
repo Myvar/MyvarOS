@@ -34,9 +34,9 @@ namespace Sedna.Core.Internals.Ast
             var re = new InvokeStmt();
 
             re.Path = raw.Raw.Trim().Split('(')[0];
-            foreach (var i in raw.Raw.Trim().Remove(raw.Raw.Trim().Length - 1, 1).Replace(re.Path, "").Remove(0,1).Split(','))
+            foreach (var i in raw.Raw.Trim().Remove(raw.Raw.Trim().Length - 1, 1).Remove(0,re.Path.Length).Remove(0,1).Split(','))
             {
-                var x = IAst.ParseToken(new Token() { Raw = i.Trim() });
+                var x = IAst.ParseToken(new Token() { Raw = i.Trim() }, true);
                 if(x != null)
                 {
                     re.Perams.AddRange(x);

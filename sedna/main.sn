@@ -9,7 +9,11 @@ type Program
     fn Main() 
     {            
         dec num = 10 + 10;
-        puts(itos(num));
-        
+        puts("10 plus 10 is " + itos(num) + "\n");
+
+        dec num_str = itos(num);
+
+        dec name = "Kevin";
+        puts(name + " is " + num_str + " years old\n");
     }
 }

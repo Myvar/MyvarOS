@@ -70,10 +70,10 @@ void executeByteCode(char *bytecode, int size)
 
     for (x = 0; x < size; x++)
     {
-        if (debug == 1)
-        {
-            //  kprintf("[%x:%x]\n", x, bytecode[x]);
-        }
+        //if (debug == 1)
+        //{
+              //kprintf("[%x:%x] ", x, bytecode[x]);
+       // }
         if (bytecode[x] == 0x20) //loadstr
         {
             x++;

@@ -20,6 +20,6 @@ void sedna_system_call(char *modulename, char *func, Stack *args)
         itoa(arg, 10, buf);
         PushStack(args, buf, 0);//push string onto stack
 
-        //kfree(arg);
+        kfree(arg);
     }
 }

@@ -30,10 +30,18 @@ namespace Sedna.Core.Internals
             new ResolveStmt()
         };
 
-        public static List<IAst> ParseToken(Token t)
+        public static List<IAst> ParseToken(Token t, bool secondery = false)
         {
             Buffer.Clear();
             
+            if(secondery)
+            {
+                if(new ResolveStmt().IsValid(t))
+                {
+                    return new List<IAst>(){ new ResolveStmt().Parse(t) };
+                }
+            }
+
             foreach (var i in AstIndex)
             {
                 if (i.IsValid(t))
