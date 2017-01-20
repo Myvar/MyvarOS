@@ -33,9 +33,9 @@ namespace Sedna.Core.Internals.Ast
             {
                 if (s[i] == '+' || s[i] == '-' || s[i] == '*' || s[i] == '/')
                 {
-                    re.Segments.Add(tmp);
+                    re.Segments.Add(tmp.Trim());
                     tmp = "";
-                    re.Segments.Add(s[i].ToString());
+                    re.Segments.Add(s[i].ToString().Trim());
                 }
                 else
                 {
@@ -43,7 +43,7 @@ namespace Sedna.Core.Internals.Ast
                 }
             }
 
-            re.Segments.Add(tmp);
+            re.Segments.Add(tmp.Trim());
 
             return re;
         }

@@ -24,7 +24,6 @@ void sedna_execute_module(SEDNAMODULE *mod)
     executeByteCode(mainMeth.bytecode, mainMeth.bytecode_sz);
 }
 
-
 Stack CreateNewStack(unsigned int size)
 {
     Stack ret;
@@ -39,12 +38,19 @@ void *PopStack(Stack *stack)
     return (void *)stack->stack[--stack->count];
 }
 
-void PushStack(Stack *stack, void *value)
+void *PopStackWithType(Stack *stack, int* outType)
+{
+   outType = (int *)stack->type[--stack->count];
+    return (void *)stack->stack[stack->count]; 
+}
+
+void PushStack(Stack *stack, void *value, int type)
 {
     stack->stack[stack->count++] = value;
 }
 
-void ** Variables;
+void **Variables;
+int VarTypes[1024];
 
 void executeByteCode(char *bytecode, int size)
 {
@@ -58,9 +64,10 @@ void executeByteCode(char *bytecode, int size)
 
     for (x = 0; x < size; x++)
     {
-        //kprintf("Opcode[%x]\n", bytecode[x]);
+        //kprintf("[%x:%x] ", x, bytecode[x]);
         if (bytecode[x] == 0x20) //loadstr
         {
+            //puts("LoadStr\n");
             x++;
             stringLenth = *((signed int *)(bytecode + x));
             x += 4; //skip the string lenth
@@ -71,68 +78,94 @@ void executeByteCode(char *bytecode, int size)
                 buf[j] = bytecode[x++];
             }
             buf[stringLenth] = '\0';
-            //puts(buf);
-            PushStack(&stack, buf);
+            //kprintf("Loading %s onto stack\n", buf);
+            PushStack(&stack, buf, 0);
             x--;
         }
-        if (bytecode[x] == 0x30)//call
+        else if (bytecode[x] == 0x30) //call
         {
+           // puts("Call\n");
             x++;
             stringLenth = *((signed int *)(bytecode + x));
-            x += 4; //skip the string lenth
-            char buf[stringLenth + 1];// = kmalloc(stringLenth + 1);
+            x += 4;                    //skip the string lenth
+            char buf[stringLenth + 1]; // = kmalloc(stringLenth + 1);
             //kprintf("String leng: %x\n", stringLenth);
             for (j = 0; j < stringLenth; j++)
             {
                 buf[j] = bytecode[x++];
             }
             buf[stringLenth] = '\0';
-            //puts(buf);
+            
             sedna_call(buf, &stack);
             kfree(buf);
             x--;
         }
-        if (bytecode[x] == 0x21)//load int
+        else if (bytecode[x] == 0x21) //load int
         {
+            //puts("loadint\n");
             x++;
             variable = *((signed int *)(bytecode + x));
             x += 4; //skip the string lenth
-            
-            PushStack(&stack, variable);
 
+            PushStack(&stack, variable, 1);
             x--;
+
         }
-        if (bytecode[x] == 0x40)//create variable
+        else if (bytecode[x] == 0x40) //create variable
         {
+           // puts("createlocl\n");
             x++;
             variable = *((signed int *)(bytecode + x));
             x += 4; //skip the string lenth
-            
+
             Variables[variable] = kmalloc(1);
-
             x--;
+
         }
-        if (bytecode[x] == 0x41)//set local variable
+        else if (bytecode[x] == 0x41) //set local variable
         {
-            x++;
-            int varIndex = (int*)PopStack(&stack);
-            void* varValue = PopStack(&stack);
-            
+           // puts("setlocal\n");
+            int varIndex = (int *)PopStack(&stack);
+            int type;
+            void *varValue = PopStackWithType(&stack, &type);
+
             //kprintf("Loading value\"%s\" into variable %x\n", varValue, varIndex);
             kfree(Variables[varIndex]);
             Variables[varIndex] = varValue;
+            VarTypes[varIndex] = type;
 
-            x--;
         }
-        if (bytecode[x] == 0x42)//load local variable
+        else if (bytecode[x] == 0x42) //load local variable
         {
+           // puts("ldlocal\n");
             x++;
             variable = *((signed int *)(bytecode + x));
             x += 4; //skip the string lenth
-            
-            PushStack(&stack, Variables[variable]);
 
+            PushStack(&stack, Variables[variable], VarTypes[variable]);
             x--;
+        }
+
+        else if (bytecode[x] == 0x50) //load local variable
+        {
+            //puts("Tring to add");
+            int tA,tB;
+
+            void *varB = (void *)PopStackWithType(&stack, &tA);
+            void *varA = (void *)PopStackWithType(&stack, &tB);
+
+            if(tA == tB)
+            {
+                if(tA == 0)//string
+                {
+                    PushStack(&stack, strJoin((char*)varA, (char*)varB), tA);
+                    //kprintf("%s + %s = %s", (char*)varA, (char*)varB, strJoin((char*)varA, (char*)varB));
+                }
+            }
+
+           
+
+            
         }
     }
 }

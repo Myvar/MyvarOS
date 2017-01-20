@@ -41,6 +41,25 @@ void strappend(char *s, char c)
     s[len + 1] = '\0';
 }
 
+char * strJoin(char *a, char *b)
+{
+    char* re = kmalloc(strlen(a) + strlen(b));
+   
+    int i, c;
+    for(i =0; i < strlen(a); i++)
+    {
+        re[c++] = a[i];
+    }
+
+    for(i =0; i < strlen(b); i++)
+    {
+        re[c++] = b[i];
+    }
+
+    //kprintf(re);
+    return re;
+}
+
 void strremovelast(char *s)
 {
 

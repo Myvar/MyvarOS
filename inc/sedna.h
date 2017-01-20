@@ -36,6 +36,7 @@ typedef struct
 {
     unsigned int count;
     int * stack;
+    int * type;
 } Stack;
 
 typedef struct
@@ -46,7 +47,7 @@ typedef struct
 } FuncDef;
 
 extern void *PopStack(Stack *stack);
-extern void PushStack(Stack *stack, void *value);
+extern void PushStack(Stack *stack, void *value, int type);
 
 extern void sedna_system_call(char* modulename, char* func, Stack* args);
 

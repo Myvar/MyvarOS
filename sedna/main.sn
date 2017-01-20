@@ -7,8 +7,8 @@ type Program
 {
     @entry
     fn Main() 
-    {       
+    {            
         dec name : str = "Kevin";
-        puts("Look " + name + "\nI am sedna code talking to you\n");
+        puts("Welcome " + name);
     }
 }
