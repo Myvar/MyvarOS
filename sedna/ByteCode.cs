@@ -169,12 +169,13 @@ namespace Sedna.Core
             {
                 var x = Opcode as ResolveStmt;
 
+                EmitParameter(new ValueStmt() { Value = x.Segments[0]}, ref count);
                 for (int i = 0; i < x.Segments.Count; i++)
                 {
                     if (x.Segments[i] == "+")
                     {
                         //load a and b onto stack
-                        EmitParameter(new ValueStmt() { Value = x.Segments[i - 1] }, ref count);
+                        
                         EmitParameter(new ValueStmt() { Value = x.Segments[i + 1] }, ref count);
 
                         count++;
@@ -182,8 +183,7 @@ namespace Sedna.Core
                     }
                     if (x.Segments[i] == "-")
                     {
-                        //load a and b onto stack
-                        EmitParameter(new ValueStmt() { Value = x.Segments[i - 1] }, ref count);
+                        //load a and b onto stack                       
                         EmitParameter(new ValueStmt() { Value = x.Segments[i + 1] }, ref count);
 
                         count++;
@@ -191,8 +191,7 @@ namespace Sedna.Core
                     }
                     if (x.Segments[i] == "*")
                     {
-                        //load a and b onto stack
-                        EmitParameter(new ValueStmt() { Value = x.Segments[i - 1] }, ref count);
+                        //load a and b onto stack                       
                         EmitParameter(new ValueStmt() { Value = x.Segments[i + 1] }, ref count);
 
                         count++;
@@ -200,8 +199,7 @@ namespace Sedna.Core
                     }
                     if (x.Segments[i] == "/")
                     {
-                        //load a and b onto stack
-                        EmitParameter(new ValueStmt() { Value = x.Segments[i - 1] }, ref count);
+                        //load a and b onto stack                        
                         EmitParameter(new ValueStmt() { Value = x.Segments[i + 1] }, ref count);
 
                         count++;
