@@ -24,6 +24,7 @@ void sedna_execute_module(SEDNAMODULE *mod)
     executeByteCode(mainMeth.bytecode, mainMeth.bytecode_sz);
 }
 
+
 Stack CreateNewStack(unsigned int size)
 {
     Stack ret;
@@ -43,14 +44,17 @@ void PushStack(Stack *stack, void *value)
     stack->stack[stack->count++] = value;
 }
 
+void ** Variables;
+
 void executeByteCode(char *bytecode, int size)
 {
 
     //create stack
     Stack stack = CreateNewStack(1024);
+    Variables = kmalloc(1024 * 4);
 
     int x, c, j;
-    signed int stringLenth;
+    signed int stringLenth, variable;
 
     for (x = 0; x < size; x++)
     {
@@ -71,7 +75,7 @@ void executeByteCode(char *bytecode, int size)
             PushStack(&stack, buf);
             x--;
         }
-        if (bytecode[x] == 0x30)
+        if (bytecode[x] == 0x30)//call
         {
             x++;
             stringLenth = *((signed int *)(bytecode + x));
@@ -86,6 +90,48 @@ void executeByteCode(char *bytecode, int size)
             //puts(buf);
             sedna_call(buf, &stack);
             kfree(buf);
+            x--;
+        }
+        if (bytecode[x] == 0x21)//load int
+        {
+            x++;
+            variable = *((signed int *)(bytecode + x));
+            x += 4; //skip the string lenth
+            
+            PushStack(&stack, variable);
+
+            x--;
+        }
+        if (bytecode[x] == 0x40)//create variable
+        {
+            x++;
+            variable = *((signed int *)(bytecode + x));
+            x += 4; //skip the string lenth
+            
+            Variables[variable] = kmalloc(1);
+
+            x--;
+        }
+        if (bytecode[x] == 0x41)//set local variable
+        {
+            x++;
+            int varIndex = (int*)PopStack(&stack);
+            void* varValue = PopStack(&stack);
+            
+            //kprintf("Loading value\"%s\" into variable %x\n", varValue, varIndex);
+            kfree(Variables[varIndex]);
+            Variables[varIndex] = varValue;
+
+            x--;
+        }
+        if (bytecode[x] == 0x42)//load local variable
+        {
+            x++;
+            variable = *((signed int *)(bytecode + x));
+            x += 4; //skip the string lenth
+            
+            PushStack(&stack, Variables[variable]);
+
             x--;
         }
     }

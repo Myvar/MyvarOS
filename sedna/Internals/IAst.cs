@@ -26,7 +26,7 @@ namespace Sedna.Core.Internals
             new ExpressionStmt(),
 
             /* Must always be last becuse isvalid logic is a littlbit fuzzy */
-            
+            new ResolveStmt()
         };
 
         public static List<IAst> ParseToken(Token t)

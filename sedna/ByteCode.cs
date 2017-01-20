@@ -11,14 +11,15 @@ namespace Sedna.Core
     {
         List<byte> _Buf = new List<byte>();
         int bc_count = 0;
+        List<string> variables = new List<string>();
 
         public void Emit(List<IAst> ast)
         {
 
             //write scope
-            foreach(var i in ast)
+            foreach (var i in ast)
             {
-                if(i is ScopeStmt)
+                if (i is ScopeStmt)
                 {
                     var x = i as ScopeStmt;
                     WriteString(x.ScopeName); //Write ScopeName
@@ -29,9 +30,9 @@ namespace Sedna.Core
 
             var imports = new List<string>();
             //build imports index
-            foreach(var i in ast)
+            foreach (var i in ast)
             {
-                if(i is ImportStmt)
+                if (i is ImportStmt)
                 {
                     var x = i as ImportStmt;
                     imports.Add(x.ScopeName);
@@ -39,18 +40,18 @@ namespace Sedna.Core
             }
 
             WriteInt(imports.Count);
-            
-            foreach(var i in imports)
+
+            foreach (var i in imports)
             {
                 WriteString(i);
             }
 
             var typeindex = new List<TypeStmt>();
 
-             //build type index
-            foreach(var i in ast)
+            //build type index
+            foreach (var i in ast)
             {
-                if(i is TypeStmt)
+                if (i is TypeStmt)
                 {
                     var x = i as TypeStmt;
                     typeindex.Add(x);
@@ -61,16 +62,16 @@ namespace Sedna.Core
             WriteInt(typeindex.Count);
 
 
-            foreach(var i in typeindex)
+            foreach (var i in typeindex)
             {
                 WriteString(i.Name);
                 WriteString(i.BaseType);
 
                 var methodIndex = new List<FnStmt>();
-                
-                foreach(var method in i.Body)
+
+                foreach (var method in i.Body)
                 {
-                    if(method is FnStmt)
+                    if (method is FnStmt)
                     {
                         methodIndex.Add(method as FnStmt);
                     }
@@ -80,29 +81,30 @@ namespace Sedna.Core
 
                 //first calulate opcodes count
 
-                foreach(var method in methodIndex)
+                foreach (var method in methodIndex)
                 {
                     WriteString(method.Name);
 
                     WriteInt(method.Parameters.Count);
-                    foreach(var parm in method.Parameters)
+                    foreach (var parm in method.Parameters)
                     {
                         WriteString(parm.Value);
                     }
 
+                    variables = new List<string>();
                     //calualte bytecode count
                     AllowWrite = false;
                     int count = 0;
 
                     int start_byte_count = bc_count;
 
-                    foreach(var stmts in method.Body)
+                    foreach (var stmts in method.Body)
                     {
                         Emit(stmts, ref count);
                     }
 
                     //Write actuale byte code
-                    AllowWrite = true;                    
+                    AllowWrite = true;
 
                     // Write the total bytes of "bytecode". This
                     // is to help with reading the module without
@@ -114,7 +116,7 @@ namespace Sedna.Core
 
                     WriteInt(count);
                     count = 0;
-                    foreach(var stmts in method.Body)
+                    foreach (var stmts in method.Body)
                     {
                         Emit(stmts, ref count);
                     }
@@ -125,10 +127,10 @@ namespace Sedna.Core
 
         public void Emit(IAst Opcode, ref int count)
         {
-            if(Opcode is InvokeStmt)
+            if (Opcode is InvokeStmt)
             {
                 var x = Opcode as InvokeStmt;
-                foreach(var i in x.Perams)
+                foreach (var i in x.Perams)
                 {
                     EmitParameter(i, ref count);
                 }
@@ -138,19 +140,95 @@ namespace Sedna.Core
                 WriteByte(0x30);//call opcode
                 WriteString(ResolveCall(x.Path));
             }
+
+            if (Opcode is DecStmt)
+            {
+                var x = Opcode as DecStmt;
+                //register variable internaly
+                variables.Add(x.Name);
+                //register variable in interpiter
+                count++;
+                WriteByte(0x40);
+                WriteInt(variables.IndexOf(x.Name));
+
+                EmitParameter(x.Value, ref count);
+
+                count++;
+                WriteByte(0x21);
+                WriteInt(variables.IndexOf(x.Name));
+
+                //load the value into the local variable
+                count++;
+                WriteByte(0x41);
+            }
         }
 
         public void EmitParameter(IAst Opcode, ref int count)
         {
-            if(Opcode is ValueStmt)
+            if (Opcode is ResolveStmt)
+            {
+                var x = Opcode as ResolveStmt;
+
+                for (int i = 0; i < x.Segments.Count; i++)
+                {
+                    if (x.Segments[i] == "+")
+                    {
+                        //load a and b onto stack
+                        EmitParameter(new ValueStmt() { Value = x.Segments[i - 1] }, ref count);
+                        EmitParameter(new ValueStmt() { Value = x.Segments[i + 1] }, ref count);
+
+                        count++;
+                        WriteByte(0x50);
+                    }
+                    if (x.Segments[i] == "-")
+                    {
+                        //load a and b onto stack
+                        EmitParameter(new ValueStmt() { Value = x.Segments[i - 1] }, ref count);
+                        EmitParameter(new ValueStmt() { Value = x.Segments[i + 1] }, ref count);
+
+                        count++;
+                        WriteByte(0x51);
+                    }
+                    if (x.Segments[i] == "*")
+                    {
+                        //load a and b onto stack
+                        EmitParameter(new ValueStmt() { Value = x.Segments[i - 1] }, ref count);
+                        EmitParameter(new ValueStmt() { Value = x.Segments[i + 1] }, ref count);
+
+                        count++;
+                        WriteByte(0x52);
+                    }
+                    if (x.Segments[i] == "/")
+                    {
+                        //load a and b onto stack
+                        EmitParameter(new ValueStmt() { Value = x.Segments[i - 1] }, ref count);
+                        EmitParameter(new ValueStmt() { Value = x.Segments[i + 1] }, ref count);
+
+                        count++;
+                        WriteByte(0x53);
+                    }
+                }
+
+            }
+            if (Opcode is ValueStmt)
             {
                 var x = Opcode as ValueStmt;
-                if(x.Value.StartsWith("\""))
+
+                if (variables.Contains(x.Value))
                 {
                     count++;
-                    WriteByte(0x20);//loadstr opcode
-                    WriteString(EscapeLiternals(x.Value.Trim().Trim('"')));
-                    return;
+                    WriteByte(0x42);//Load the local variable
+                    WriteInt(variables.IndexOf(x.Value));
+                }
+                else
+                {
+                    if (x.Value.StartsWith("\""))
+                    {
+                        count++;
+                        WriteByte(0x20);//loadstr opcode
+                        WriteString(EscapeLiternals(x.Value.Trim().Trim('"')));
+                        return;
+                    }
                 }
             }
         }
@@ -177,7 +255,7 @@ namespace Sedna.Core
         {
             bc_count += 4 + Encoding.ASCII.GetByteCount(s);
 
-            if(!AllowWrite)
+            if (!AllowWrite)
             {
                 return;
             }
@@ -190,7 +268,7 @@ namespace Sedna.Core
         {
             bc_count += 4;
 
-            if(!AllowWrite)
+            if (!AllowWrite)
             {
                 return;
             }
@@ -202,7 +280,7 @@ namespace Sedna.Core
         {
             bc_count += 1;
 
-            if(!AllowWrite)
+            if (!AllowWrite)
             {
                 return;
             }

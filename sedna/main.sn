@@ -8,8 +8,7 @@ type Program
     @entry
     fn Main() 
     {       
-        puts("Look Kevin\nI am sedna code talking to you\n");
-        puts("bye\n");
-        puts("bye\n");
+        dec name : str = "Kevin";
+        puts("Look " + name + "\nI am sedna code talking to you\n");
     }
 }

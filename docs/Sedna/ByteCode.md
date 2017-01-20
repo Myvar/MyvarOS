@@ -78,6 +78,13 @@ ID: 0x20
 
 Parameter 1: Stiring
 
+### LoadInt
+
+Loads an int onto the stack
+
+ID: 0x21
+
+Parameter 1: Int;
 
 ### Call
 
@@ -87,3 +94,47 @@ ID: 0x30
 
 Parameter 1: Stiring
 
+### Dec Variable
+
+ID: 0x40
+
+declears a variable
+
+Parameter 1: int
+
+### SetLocalVariable
+
+ID: 0x41
+
+Will pop last value on stack and save it in local variable
+
+### LoadLocalVariable
+
+ID: 0x42
+
+Will take parm 1 as var index and loads its value onto the stack
+
+
+### Add
+
+ID: 0x50
+
+adds the two items on the stack together
+
+### Sub
+
+ID: 0x51
+
+adds the two items on the stack together
+
+### Mul
+
+ID: 0x52
+
+adds the two items on the stack together
+
+### Dev
+
+ID: 0x53
+
+adds the two items on the stack together
