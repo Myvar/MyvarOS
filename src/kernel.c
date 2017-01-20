@@ -388,6 +388,11 @@ void kprintf(const char *fmt, ...)
       s = itoh(i, fmtbuf);
       puts(s);
       break;
+    case 'n':
+      i = va_arg(argp, int);
+      itoa(fmtbuf, 10, s);
+      puts(s);
+      break;
     case '%':
       putc('%');
       break;

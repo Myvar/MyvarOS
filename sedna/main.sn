@@ -8,13 +8,8 @@ type Program
     @entry
     fn Main() 
     {            
-        dec name : str = "Kevin";
-        dec osName = "MyvarOS";
-
-        puts("Welcome " + name + " to " + osName + "\n");
-
-        osName = "The Best OS Ever";
-        puts("Welcome " + name + " to " + osName + "\n");
+        dec num = 10 + 10;
+        puts(itos(num));
         
     }
 }

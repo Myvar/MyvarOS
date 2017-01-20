@@ -165,8 +165,8 @@ namespace Sedna.Core
             if (Opcode is AssignStmt)
             {
                 var x = Opcode as AssignStmt;
-              
-                
+
+
 
                 EmitParameter(x.Value, ref count);
 
@@ -186,13 +186,13 @@ namespace Sedna.Core
             {
                 var x = Opcode as ResolveStmt;
 
-                EmitParameter(new ValueStmt() { Value = x.Segments[0]}, ref count);
+                EmitParameter(new ValueStmt() { Value = x.Segments[0] }, ref count);
                 for (int i = 0; i < x.Segments.Count; i++)
                 {
                     if (x.Segments[i] == "+")
                     {
                         //load a and b onto stack
-                        
+
                         EmitParameter(new ValueStmt() { Value = x.Segments[i + 1] }, ref count);
 
                         count++;
@@ -225,7 +225,7 @@ namespace Sedna.Core
                 }
 
             }
-            if (Opcode is ValueStmt)
+            else if (Opcode is ValueStmt)
             {
                 var x = Opcode as ValueStmt;
 
@@ -244,7 +244,17 @@ namespace Sedna.Core
                         WriteString(EscapeLiternals(x.Value.Trim().Trim('"')));
                         return;
                     }
+                    else if(char.IsDigit(x.Value.Trim()[0]))
+                    {
+                        count++;
+                        WriteByte(0x21);//loadstr opcode
+                        WriteInt(int.Parse(x.Value.Trim()));
+                    }
                 }
+            }
+            else
+            {
+                Emit(Opcode, ref count);
             }
         }
 
