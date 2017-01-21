@@ -6,25 +6,23 @@ type Program
 {
     @entry
     fn Main() 
-    {            
-        dec num = 10 + 10 - 10 * 20 / 10;
-        
-        display.clear();
+    {                  
+        Log("Starting Sedna Shell");
 
-        display.setx(0);
-        display.sety(1);
+        display.clear();               
 
-        display.setcolorfg(10);        
+        Log("Sedna Shell Started");       
 
-        stdio.puts("10 plus 10 is " + stdio.itos(num) + "\n");
-
-        display.setcolorfg(0xF);
-
-        Test();
     }
 
-    fn Test()
-    {
-        stdio.puts("test");
+    fn Log(msg : str)
+    {   
+        stdio.puts("[");
+        display.setcolorfg(0xA);
+        stdio.puts("Log");
+        display.setcolorfg(0xF);
+        stdio.puts("]");
+
+        stdio.puts(msg);
     }
 }

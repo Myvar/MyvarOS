@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using Sedna.Core.Internals;
@@ -16,7 +17,8 @@ namespace Sedna.Core
         private List<Module> Modules { get; set; } = new List<Module>();
         private List<string> Imports { get; set; } = new List<string>();
         private List<string> Methods { get; set; } = new List<string>();
-        
+        private Dictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
+
 
 
         private void LoadModule(string file)
@@ -117,6 +119,7 @@ namespace Sedna.Core
 
                 foreach (var method in methodIndex)
                 {
+                    Parameters = method.Parameters;
                     WriteString(method.Name);
 
                     WriteInt(method.Parameters.Count);
@@ -131,6 +134,24 @@ namespace Sedna.Core
                     int count = 0;
 
                     int start_byte_count = bc_count;
+
+                    foreach (var prm in Parameters.Reverse())
+                    {
+                        //load all the parameters into local variables
+                        variables.Add(prm.Key);
+                        //register variable in interpiter
+                        count++;
+                        WriteByte(0x40);
+                        WriteInt(variables.IndexOf(prm.Key));                       
+
+                        count++;
+                        WriteByte(0x21);
+                        WriteInt(variables.IndexOf(prm.Key));
+
+                        //load the value into the local variable
+                        count++;
+                        WriteByte(0x41);
+                    }
 
                     foreach (var stmts in method.Body)
                     {
@@ -150,6 +171,25 @@ namespace Sedna.Core
 
                     WriteInt(count);
                     count = 0;
+
+                    foreach (var prm in Parameters.Reverse())
+                    {
+                        //load all the parameters into local variables
+                        variables.Add(prm.Key);
+                        //register variable in interpiter
+                        count++;
+                        WriteByte(0x40);
+                        WriteInt(variables.IndexOf(prm.Key));                       
+
+                        count++;
+                        WriteByte(0x21);
+                        WriteInt(variables.IndexOf(prm.Key));
+
+                        //load the value into the local variable
+                        count++;
+                        WriteByte(0x41);
+                    }
+
                     foreach (var stmts in method.Body)
                     {
                         Emit(stmts, ref count);
@@ -306,7 +346,7 @@ namespace Sedna.Core
         {
 
             //cheack if it is a local method
-            if(Methods.Contains(s))
+            if (Methods.Contains(s))
             {
                 return "[this]" + s;
             }
