@@ -3,6 +3,8 @@ extern void Test_Paging();
 extern void Termianl_Init();
 extern void Termianl_Clear();
 extern void Terminal_SetColor(char color, char bg);
+extern void Terminal_SetColorFG(char color);
+extern void Terminal_SetColorBG(char color);
 extern void putc(char c);
 extern void puts(char * str);
 extern void putLog(char* string);

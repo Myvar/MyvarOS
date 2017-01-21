@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using Newtonsoft.Json;
 using Sedna.Core.Internals;
 using Sedna.Core.Internals.Ast;
 
@@ -12,6 +13,39 @@ namespace Sedna.Core
         List<byte> _Buf = new List<byte>();
         int bc_count = 0;
         List<string> variables = new List<string>();
+        private List<Module> Modules { get; set; } = new List<Module>();
+        private List<string> Imports { get; set; } = new List<string>();
+        private List<string> Methods { get; set; } = new List<string>();
+        
+
+
+        private void LoadModule(string file)
+        {
+            Modules.Add(JsonConvert.DeserializeObject<Module>(File.ReadAllText(file)));
+        }
+
+        public ByteCode()
+        {
+            string file = "";
+
+            if (Directory.Exists("./Modules"))
+            {
+                file = "./Modules";
+            }
+            else
+            {
+                file = "../Modules";
+            }
+
+
+            foreach (var i in Directory.GetFiles(file))
+            {
+                if (i.EndsWith(".json"))
+                {
+                    LoadModule(i);
+                }
+            }
+        }
 
         public void Emit(List<IAst> ast)
         {
@@ -28,20 +62,19 @@ namespace Sedna.Core
                 }
             }
 
-            var imports = new List<string>();
-            //build imports index
+
             foreach (var i in ast)
             {
                 if (i is ImportStmt)
                 {
                     var x = i as ImportStmt;
-                    imports.Add(x.ScopeName);
+                    Imports.Add(x.ScopeName);
                 }
             }
 
-            WriteInt(imports.Count);
+            WriteInt(Imports.Count);
 
-            foreach (var i in imports)
+            foreach (var i in Imports)
             {
                 WriteString(i);
             }
@@ -74,6 +107,7 @@ namespace Sedna.Core
                     if (method is FnStmt)
                     {
                         methodIndex.Add(method as FnStmt);
+                        Methods.Add((method as FnStmt).Name);
                     }
                 }
 
@@ -243,6 +277,12 @@ namespace Sedna.Core
                         WriteString(EscapeLiternals(x.Value.Trim().Trim('"')));
                         return;
                     }
+                    else if (x.Value.Trim().ToLower().StartsWith("0x"))
+                    {
+                        count++;
+                        WriteByte(0x21);//loadstr opcode
+                        WriteInt(Convert.ToInt32(x.Value.Trim(), 16));
+                    }
                     else if (char.IsDigit(x.Value.Trim()[0]))
                     {
                         count++;
@@ -264,6 +304,33 @@ namespace Sedna.Core
 
         public string ResolveCall(string s)
         {
+
+            //cheack if it is a local method
+            if(Methods.Contains(s))
+            {
+                return "[this]" + s;
+            }
+
+            //try finding using import
+            foreach (var i in Modules)
+            {
+                if (Imports.Contains(i.Name))
+                {
+                    foreach (var m in i.Methods)
+                    {
+                        if ((m.NameSpace + "." + m.Class + "." + m.MethodName)
+                        == i.Name + "." + s)
+                        {
+                            var re = "[" + i.Name + "]" +
+                            (m.NameSpace.Remove(0, i.Name.Length).Length == 0 ?
+                            "" : m.NameSpace.Remove(0, i.Name.Length) + ".") +
+                            m.Class + "::" + m.MethodName;
+
+                            return re;
+                        }
+                    }
+                }
+            }
             //hardcode for now
             return "[Kernel]stdio::" + s;
         }

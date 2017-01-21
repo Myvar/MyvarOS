@@ -7,16 +7,18 @@ using System.Threading.Tasks;
 using Sedna.Core.Internals;
 using Sedna.Core.Internals.Ast;
 using System.Collections;
+using Newtonsoft.Json;
 
 namespace Sedna.Core
 {
     public class Compiler
     {
-        private static CompilerScope _Scope  = new CompilerScope();
+        private static CompilerScope _Scope = new CompilerScope();
+       
 
         public Compiler()
         {
-            
+
         }
 
         public void Compile(List<string> src, string Output, string target)
@@ -28,8 +30,11 @@ namespace Sedna.Core
                 3. Astyfie
                 4. Assemble
             */
-            _Scope = new CompilerScope();
+
            
+
+            _Scope = new CompilerScope();
+
             var bc = new ByteCode();
 
             foreach (var i in src)
@@ -41,10 +46,10 @@ namespace Sedna.Core
             }
 
             bc.Write(Output);
-           
+
         }
 
-        public static  bool CheckErrors()
+        public static bool CheckErrors()
         {
             if (Parser.Errors.Count == 0 && _Scope.Errors.Count == 0)
             {
@@ -64,6 +69,23 @@ namespace Sedna.Core
                 }
                 return false;
             }
-        }  
+        }
+    }
+
+    public class Module
+    {
+        public string Name { get; set; }
+        public string Description { get; set; }
+
+        public List<Method> Methods { get; set; } = new List<Method>();
+    }
+
+    public class Method
+    {
+        public string NameSpace { get; set; }
+        public string Class { get; set; }
+        public string MethodName { get; set; }
+        public List<string> Parameters { get; set; } = new List<string>();
+        public string Returns { get; set; }
     }
 }

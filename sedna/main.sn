@@ -1,4 +1,3 @@
-imports System
 imports Kernel
 
 scope MyvarOS
@@ -8,12 +7,24 @@ type Program
     @entry
     fn Main() 
     {            
-        dec num = 10 + 10;
-        puts("10 plus 10 is " + itos(num) + "\n");
+        dec num = 10 + 10 - 10 * 20 / 10;
+        
+        display.clear();
 
-        dec num_str = itos(num);
+        display.setx(0);
+        display.sety(1);
 
-        dec name = "Kevin";
-        puts(name + " is " + num_str + " years old\n");
+        display.setcolorfg(10);        
+
+        stdio.puts("10 plus 10 is " + stdio.itos(num) + "\n");
+
+        display.setcolorfg(0xF);
+
+        Test();
+    }
+
+    fn Test()
+    {
+        stdio.puts("test");
     }
 }

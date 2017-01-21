@@ -116,7 +116,7 @@ SEDNAMODULE* sedna_load_module(uintptr_t address)
         mod->method[index].param_cnt = total_para;
         mod->method[index].param_type = (unsigned char**)kmalloc(sizeof(unsigned char*) * mod->method[index].param_cnt);
 
-        //kprintf("method: %s parameter-count: %x\n", mod->method[index].name, mod->method[index].param_cnt);
+      //  kprintf("method: %s parameter-count: %x\n", mod->method[index].name, mod->method[index].param_cnt);
 
         for(x = 0; x < total_para; x++)
         {
@@ -141,6 +141,7 @@ SEDNAMODULE* sedna_load_module(uintptr_t address)
         mod->method[index].bytecode_sz = bytecode_sz;
         mod->method[index].bytecode = kmalloc(bytecode_sz);
         memcpy(mod->method[index].bytecode, (unsigned char*)(address + offset), bytecode_sz);
+        offset += bytecode_sz;
     }
 
     return mod;

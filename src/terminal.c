@@ -13,6 +13,16 @@ void Terminal_SetColor(char color, char bg)
     BG = (char) color | (char) bg << 8;
 }
 
+void Terminal_SetColorFG(char color)
+{
+    BG = (char) color | (char) BG >> 8;
+}
+
+void Terminal_SetColorBG(char color)
+{
+    BG = (char) BG  << 8 | (char) color << 8;
+}
+
 void Termianl_Init()
 {
     LFB = (char*)0xB8000;

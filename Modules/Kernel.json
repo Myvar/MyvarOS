@@ -1,0 +1,76 @@
+{
+    "Name": "Kernel",
+    "Description": "This module contains all the system calls.",
+    "Methods": [
+        {
+            "NameSpace": "Kernel",
+            "Class": "stdio",
+            "MethodName": "puts",
+            "Parameters": [
+                "str"
+            ],
+            "Returns": "void"
+        },
+        {
+            "NameSpace": "Kernel",
+            "Class": "stdio",
+            "MethodName": "putc",
+            "Parameters": [
+                "char"
+            ],
+            "Returns": "void"
+        },
+        {
+            "NameSpace": "Kernel",
+            "Class": "stdio",
+            "MethodName": "itos",
+            "Parameters": [
+                "int"
+            ],
+            "Returns": "str"
+        },
+        {
+            "NameSpace": "Kernel",
+            "Class": "display",
+            "MethodName": "setx",
+            "Parameters": [
+                "int"
+            ],
+            "Returns": "void"
+        },
+        {
+            "NameSpace": "Kernel",
+            "Class": "display",
+            "MethodName": "sety",
+            "Parameters": [
+                "int"
+            ],
+            "Returns": "void"
+        },
+        {
+            "NameSpace": "Kernel",
+            "Class": "display",
+            "MethodName": "setcolorfg",
+            "Parameters": [
+                "int"
+            ],
+            "Returns": "void"
+        },
+        {
+            "NameSpace": "Kernel",
+            "Class": "display",
+            "MethodName": "setcolorbg",
+            "Parameters": [
+                "int"
+            ],
+            "Returns": "void"
+        },
+        {
+            "NameSpace": "Kernel",
+            "Class": "display",
+            "MethodName": "clear",
+            "Parameters": [],
+            "Returns": "void"
+        }
+    ]
+}
