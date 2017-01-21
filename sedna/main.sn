@@ -5,24 +5,26 @@ scope MyvarOS
 type Program
 {
     @entry
-    fn Main() 
-    {                  
+    fn Main()
+    {
         Log("Starting Sedna Shell");
 
-        display.clear();               
+        display.clear();
 
-        Log("Sedna Shell Started");       
+        Log("Sedna Shell Started");
 
     }
 
     fn Log(msg : str)
-    {   
+    {
+        # write [log]
         stdio.puts("[");
-        display.setcolorfg(0xA);
+        display.setcolorfg(0xA);# color green
         stdio.puts("Log");
-        display.setcolorfg(0xF);
+        display.setcolorfg(0xF);# set color back to white
         stdio.puts("]");
 
+        # finaly write the mssage
         stdio.puts(msg);
     }
 }
