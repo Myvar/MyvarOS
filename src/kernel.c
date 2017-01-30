@@ -440,14 +440,13 @@ void kernel_HigherHalf()
   putLog("Installing Keybord");
   keyboard_install();
 
-  //putLog("Starting Shell");
-  //Shell_Init();
+  putLog("Starting Shell");
+  Shell_Init();
 
   while (1 == 1)
   {
-    //Kb_Sendkey(Read_Serial());
+    Kb_Sendkey(Read_Serial());
     
-    Write_Serial_Str("update~some_var!lol");
     putc(Read_Serial());
   }
 }
