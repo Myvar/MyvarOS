@@ -1,0 +1,14 @@
+// Use IntelliSense to learn about possible Mock debug attributes.
+// Hover to view descriptions of existing attributes.
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "mock",
+            "request": "launch",
+            "name": "Mock-Debug",
+            "program": "${workspaceRoot}/vscode-mock-debug/readme.md",
+            "stopOnEntry": true
+        }
+    ]
+}

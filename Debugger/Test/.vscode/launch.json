@@ -1,0 +1,24 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Launch",
+            "type": "sedna",
+            "request": "launch",
+            "program": "${workspaceRoot}/run.sh",
+            "args": [],
+            "cwd": "${workspaceRoot}",
+            "preLaunchTask": "",
+            "runtimeExecutable": null,
+            "env": {},
+            "externalConsole": true
+        },
+        {
+            "name": "Attach",
+            "type": "sedna",
+            "request": "attach",
+            "address": "localhost",
+            "port": 55555
+        }
+    ]
+}
