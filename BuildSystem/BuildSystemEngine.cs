@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 
 namespace BuildSystem
 {
@@ -23,13 +24,31 @@ namespace BuildSystem
             var exclude = new List<string>() { o.BinDirectory, o.IncludesDirectory };
             IterateSrc(src, workingdir, o, exclude);
 
+            var sb = new StringBuilder();
+
+            foreach(var f in Directory.GetFiles(bin))
+            {
+                if(f.EndsWith(".o")) sb.Append($" \"{f}\"");
+            }
+
             //link
             Log("Linking");
+            if(RunLinker($"-m elf_i386 -T \"{Path.Combine(workingdir, o.LinkerFile)}\" -o {Path.Combine(bin, "kernel.bin")} {sb.ToString()}", workingdir))
+            {
+                Log($"Linking was a success");
+            }
+            else
+            {
+                Error($"Linking Failed");
+                Environment.Exit(1);
+            }
 
             //build iso
             Log("Building iso");
 
-            //
+            //clean up
+            Log("Cleaning up files");
+            //delete all .o files in bin
         }
 
         public static void IterateSrc(string src, string workingdir, Options o, List<string> excludedDirectorys)
@@ -50,7 +69,7 @@ namespace BuildSystem
 
         public static void Gcc(string file, string workingdir, Options o)
         {
-            if (RunGcc($"{o.GccOpt} -I {o.IncludesDirectory} -c \"{file}\" -o \"{Path.Combine(workingdir, o.BinDirectory, Guid.NewGuid().ToString() + ".0")}\"", workingdir))
+            if (RunGcc($"{o.GccOpt} -I {o.IncludesDirectory} -c \"{file}\" -o \"{Path.Combine(workingdir, o.BinDirectory, Guid.NewGuid().ToString() + ".o")}\"", workingdir))
             {
                 var fl = new FileInfo(file);
                 Log($"Successfully Compiled {fl.Name}");
@@ -65,7 +84,7 @@ namespace BuildSystem
 
         public static void Nasm(string file, string workingdir, Options o)
         {
-            if (RunNasm($"-g -f elf \"{file}\" -o \"{Path.Combine(workingdir, o.BinDirectory, Guid.NewGuid().ToString() + ".0")}\"", workingdir))
+            if (RunNasm($"-g -f elf \"{file}\" -o \"{Path.Combine(workingdir, o.BinDirectory, Guid.NewGuid().ToString() + ".o")}\"", workingdir))
             {
                 var fl = new FileInfo(file);
                 Log($"Successfully Compiled {fl.Name}");
@@ -80,6 +99,7 @@ namespace BuildSystem
 
         public static bool RunGcc(string args, string workingdir) => StartProcess("gcc", workingdir, args);
         public static bool RunNasm(string args, string workingdir) => StartProcess("nasm", workingdir, args);
+        public static bool RunLinker(string args, string workingdir) => StartProcess("ld", workingdir, args);
 
 
         public static bool StartProcess(string pname, string workingdir, string args)
