@@ -45,9 +45,9 @@ namespace BuildSystem
 
             //build iso
             Log("Building iso");
-            if(File.Exists(Path.Combine(workingdir, "iso", "krnlld.bin"))) File.Delete(Path.Combine(workingdir, "iso", "krnlld.bin"));
+            if (File.Exists(Path.Combine(workingdir, "iso", "krnlld.bin"))) File.Delete(Path.Combine(workingdir, "iso", "krnlld.bin"));
             File.Copy(Path.Combine(bin, "kernel.bin"), Path.Combine(workingdir, "iso", "krnlld.bin"));
-            if (RunMkisofs($"-o \"{bin}/myvaros.iso\" -b isolinux-debug.bin -c boot.cat -input-charset utf-8 -no-emul-boot -boot-load-size 4 -boot-info-table iso", workingdir))
+            if (RunMkisofs($"-o \"{bin}/myvaros.iso\" -b isolinux-debug.bin -c boot.cat -input-charset utf-8 -no-emul-boot -boot-load-size 4 -boot-info-table -quiet iso", workingdir))
             {
                 Log($"Building iso was a success");
             }
@@ -119,26 +119,33 @@ namespace BuildSystem
         public static bool RunNasm(string args, string workingdir) => StartProcess("nasm", workingdir, args);
         public static bool RunLinker(string args, string workingdir) => StartProcess("ld", workingdir, args);
         public static bool RunMkisofs(string args, string workingdir) => StartProcess("mkisofs", workingdir, args);
-        public static bool RunQemu(string args, string workingdir) => StartProcess("qemu-system-i386", workingdir, args);
+        public static bool RunQemu(string args, string workingdir) => StartProcess("qemu-system-i386", workingdir, args, false, true);
 
 
-        public static bool StartProcess(string pname, string workingdir, string args)
+        public static bool StartProcess(string pname, string workingdir, string args, bool WaitForExit = true, bool UseShellExecute = false)
         {
             var p = new Process();
 
             p.StartInfo.FileName = pname;
             p.StartInfo.WorkingDirectory = workingdir;
             p.StartInfo.Arguments = args;
-            p.StartInfo.UseShellExecute = false;
-            p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.RedirectStandardError = true;
-            p.StartInfo.RedirectStandardOutput = true;
+            p.StartInfo.UseShellExecute = UseShellExecute;
+            p.StartInfo.CreateNoWindow = !UseShellExecute;
+            p.StartInfo.RedirectStandardError = !UseShellExecute;
+            p.StartInfo.RedirectStandardOutput = !UseShellExecute;
 
             p.Start();
-            p.WaitForExit();
+            if (WaitForExit)
+            {
+                p.WaitForExit();
 
-            LogStream(p.StandardOutput);
-            ErrorStream(p.StandardError);
+                LogStream(p.StandardOutput);
+                ErrorStream(p.StandardError);
+            }
+            else
+            {
+                return true;
+            }
 
             return p.ExitCode == 0;
         }
