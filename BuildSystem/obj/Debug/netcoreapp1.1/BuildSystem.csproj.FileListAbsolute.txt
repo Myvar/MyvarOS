@@ -1,0 +1,8 @@
+/home/myvar/Desktop/MyvarOS/BuildSystem/bin/Debug/netcoreapp1.1/BuildSystem.deps.json
+/home/myvar/Desktop/MyvarOS/BuildSystem/bin/Debug/netcoreapp1.1/BuildSystem.runtimeconfig.json
+/home/myvar/Desktop/MyvarOS/BuildSystem/bin/Debug/netcoreapp1.1/BuildSystem.runtimeconfig.dev.json
+/home/myvar/Desktop/MyvarOS/BuildSystem/bin/Debug/netcoreapp1.1/BuildSystem.dll
+/home/myvar/Desktop/MyvarOS/BuildSystem/bin/Debug/netcoreapp1.1/BuildSystem.pdb
+/home/myvar/Desktop/MyvarOS/BuildSystem/obj/Debug/netcoreapp1.1/BuildSystem.AssemblyInfo.cs
+/home/myvar/Desktop/MyvarOS/BuildSystem/obj/Debug/netcoreapp1.1/BuildSystem.dll
+/home/myvar/Desktop/MyvarOS/BuildSystem/obj/Debug/netcoreapp1.1/BuildSystem.pdb
