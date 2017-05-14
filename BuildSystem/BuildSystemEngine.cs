@@ -66,7 +66,7 @@ namespace BuildSystem
             }
 
             Log("starting Qemu");
-            RunQemu($"-m 4G -cdrom \"{bin}/myvaros.iso\" -serial tcp:127.0.0.1:4444,server,nowait", workingdir);
+            RunQemu($"-m 2G -cdrom \"{bin}/myvaros.iso\" -serial tcp:127.0.0.1:4444,server,nowait", workingdir);
         }
 
         public static void IterateSrc(string src, string workingdir, Options o, List<string> excludedDirectorys)

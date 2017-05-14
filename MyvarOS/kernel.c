@@ -5,6 +5,7 @@
 #include "idt.h"
 #include "isrs.h"
 #include "irq.h"
+#include "vm.h"
 
 extern unsigned char KERNEL_START_VADDR;
 extern unsigned char KERNEL_END_VADDR;
@@ -32,6 +33,7 @@ void kernel_HigherHalf()
 {
   tty_init();
   tty_clear();
+  tty_log("Init tty0");
   tty_log("MyvarOS is booting.");
 
   tty_log("Installing IDT.");
@@ -50,6 +52,10 @@ void kernel_HigherHalf()
   //...
 
   __asm__ __volatile__("sti");
+
+  int exe[] = { 0 };
+  //start vm
+  VM *test = vm_new(exe);
 
   while (1);
 }

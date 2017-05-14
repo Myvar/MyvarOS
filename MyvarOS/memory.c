@@ -199,7 +199,6 @@ void kfree(void *ptr)
   k_heapBMFree(&g_k_heap, ptr);
 }
 
-
 // Defined in linker script.
 extern unsigned char KERNEL_START_VADDR;
 // Defined in linker script.
@@ -277,15 +276,15 @@ void init_memory_management()
         {
           continue;
         }
-       /* puts("adding memory block to heap; base: ");
+        /* puts("adding memory block to heap; base: ");
         itoa(o_off[x], 10, buf);
         puts(buf);
         puts(" size: ");
         itoa(o_size[x], 10, buf);
         puts(buf);
-        puts("\n");
+        puts("\n"); */
         k_heapBMAddBlock(&g_k_heap, o_off[x], o_size[x], 16);
-        */
+       
         total_added += o_size[x];
       }
 
@@ -294,8 +293,13 @@ void init_memory_management()
 
     mmap_entry = (MBMMAPENTRY *)((unsigned int)mmap_entry + mmap_entry->size + 4);
   }
-
-  itoa(total_added / 1048576, 10, buf);  
+  tty_set_color(0xF, 0x0);
+  tty_putc('[');
+  tty_set_color(0xA, 0x0);
+  tty_puts("Log");
+  tty_set_color(0xF, 0x0);
+  tty_putc(']');
+  itoa(total_added / 1048576, 10, buf);
   tty_puts(buf);
   tty_puts(" mb added to kernel heap");
 }
