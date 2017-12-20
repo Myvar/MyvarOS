@@ -1,0 +1,152 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v1.1",
+    "signature": "e0580b47e70c176e4abeb29a107824c3916c1d95"
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v1.1": {
+      "BuildSystem/1.0.0": {
+        "dependencies": {
+          "EntryPoint": "1.2.0",
+          "Newtonsoft.Json": "10.0.2"
+        },
+        "runtime": {
+          "BuildSystem.dll": {}
+        }
+      },
+      "EntryPoint/1.2.0": {
+        "runtime": {
+          "lib/netstandard1.6/EntryPoint.dll": {}
+        }
+      },
+      "Newtonsoft.Json/10.0.2": {
+        "dependencies": {
+          "System.ComponentModel.TypeConverter": "4.3.0",
+          "System.Runtime.Serialization.Formatters": "4.3.0",
+          "System.Runtime.Serialization.Primitives": "4.3.0",
+          "System.Xml.XmlDocument": "4.3.0"
+        },
+        "runtime": {
+          "lib/netstandard1.3/Newtonsoft.Json.dll": {}
+        }
+      },
+      "System.Collections.NonGeneric/4.3.0": {
+        "runtime": {
+          "lib/netstandard1.3/System.Collections.NonGeneric.dll": {}
+        }
+      },
+      "System.Collections.Specialized/4.3.0": {
+        "dependencies": {
+          "System.Collections.NonGeneric": "4.3.0"
+        },
+        "runtime": {
+          "lib/netstandard1.3/System.Collections.Specialized.dll": {}
+        }
+      },
+      "System.ComponentModel.Primitives/4.3.0": {
+        "runtime": {
+          "lib/netstandard1.0/System.ComponentModel.Primitives.dll": {}
+        }
+      },
+      "System.ComponentModel.TypeConverter/4.3.0": {
+        "dependencies": {
+          "System.Collections.NonGeneric": "4.3.0",
+          "System.Collections.Specialized": "4.3.0",
+          "System.ComponentModel.Primitives": "4.3.0"
+        },
+        "runtime": {
+          "lib/netstandard1.5/System.ComponentModel.TypeConverter.dll": {}
+        }
+      },
+      "System.Runtime.Serialization.Formatters/4.3.0": {
+        "dependencies": {
+          "System.Runtime.Serialization.Primitives": "4.3.0"
+        },
+        "runtime": {
+          "lib/netstandard1.4/System.Runtime.Serialization.Formatters.dll": {}
+        }
+      },
+      "System.Runtime.Serialization.Primitives/4.3.0": {
+        "runtime": {
+          "lib/netstandard1.3/System.Runtime.Serialization.Primitives.dll": {}
+        }
+      },
+      "System.Xml.XmlDocument/4.3.0": {
+        "runtime": {
+          "lib/netstandard1.3/System.Xml.XmlDocument.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "BuildSystem/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "EntryPoint/1.2.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-t1v368jmLtiBKHv9Ow7Q02nZppQ1wPy20bn+kLTrb9E2AMxK6/OPVyKBOvmS6Hk6dfzNiwBMj8duVHE+WTG3SA==",
+      "path": "entrypoint/1.2.0",
+      "hashPath": "entrypoint.1.2.0.nupkg.sha512"
+    },
+    "Newtonsoft.Json/10.0.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-iwElSU2IXmwGvytJsezyDML2ZWDkG2JzTYzlU/BNlmzMdlmRvbnwITsGGY74gwVEpDli1UdOLkMT7/3jxWvXzA==",
+      "path": "newtonsoft.json/10.0.2",
+      "hashPath": "newtonsoft.json.10.0.2.nupkg.sha512"
+    },
+    "System.Collections.NonGeneric/4.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-a+IE0crqSEqmMdPr5suVjSEs7vgM/4kBnNS1T4ZQ2ABKh08LPRmlT0xQbwf01IRnaak0a6IB2mPXzPXQmSB9UQ==",
+      "path": "system.collections.nongeneric/4.3.0",
+      "hashPath": "system.collections.nongeneric.4.3.0.nupkg.sha512"
+    },
+    "System.Collections.Specialized/4.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-/MFO5RTyFTaq29lrdDv6UkRABeyLb6iHMw70rVmaKuojoIazLGvP18v5zYbfkQk0yu/MtUibOKBITjYwBls9mQ==",
+      "path": "system.collections.specialized/4.3.0",
+      "hashPath": "system.collections.specialized.4.3.0.nupkg.sha512"
+    },
+    "System.ComponentModel.Primitives/4.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-uRPgljcJf6bUBUrxRlc28OvFgHLaax5x3r5o5mT0T+lbl9Ic63/NfFhUC2CuzVSasnagMfz9J5VaNy1eUA48hA==",
+      "path": "system.componentmodel.primitives/4.3.0",
+      "hashPath": "system.componentmodel.primitives.4.3.0.nupkg.sha512"
+    },
+    "System.ComponentModel.TypeConverter/4.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-U9hqB9ypjV1THrcVYLpmizdNMC/dREGPAkZnRFZiMK6bBI1wiOOi9y70kX4pSBhEQ3qKZbJcok8HUFzLNw5zkA==",
+      "path": "system.componentmodel.typeconverter/4.3.0",
+      "hashPath": "system.componentmodel.typeconverter.4.3.0.nupkg.sha512"
+    },
+    "System.Runtime.Serialization.Formatters/4.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-KESDFO7GHK2XWAH5/HoNgxcZ+nymU/eFaZqt93w577jHS8n3c/iOoCkBYQjJxQHvHQvBUvhdEO9bdkUIismD2g==",
+      "path": "system.runtime.serialization.formatters/4.3.0",
+      "hashPath": "system.runtime.serialization.formatters.4.3.0.nupkg.sha512"
+    },
+    "System.Runtime.Serialization.Primitives/4.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-UdlzjKnD1xsGbQPC3kQXZaInWPZqb6UJVQzVipnWVXeT2QyLMigePOH+gcnCsxBojdxiOQyhBCXCKBSK7GaarQ==",
+      "path": "system.runtime.serialization.primitives/4.3.0",
+      "hashPath": "system.runtime.serialization.primitives.4.3.0.nupkg.sha512"
+    },
+    "System.Xml.XmlDocument/4.3.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-bJAfcIy4CAbJcjIZECLaVQgaoqa2kl3gAqgLPUe2iQFyVeR1VGmWhBWyFxdt2wiuxwAJw/0IinqGNbKicwu+Ng==",
+      "path": "system.xml.xmldocument/4.3.0",
+      "hashPath": "system.xml.xmldocument.4.3.0.nupkg.sha512"
+    }
+  }
+}

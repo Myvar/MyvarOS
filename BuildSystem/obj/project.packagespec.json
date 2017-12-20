@@ -1,0 +1,41 @@
+﻿{
+  "version": "1.0.0",
+  "restore": {
+    "projectUniqueName": "/home/myvar/Desktop/GitHub/MyvarOS/BuildSystem/BuildSystem.csproj",
+    "projectName": "BuildSystem",
+    "projectPath": "/home/myvar/Desktop/GitHub/MyvarOS/BuildSystem/BuildSystem.csproj",
+    "outputPath": "/home/myvar/Desktop/GitHub/MyvarOS/BuildSystem/obj/",
+    "projectStyle": "PackageReference",
+    "originalTargetFrameworks": [
+      "netcoreapp2.0"
+    ],
+    "frameworks": {
+      "netcoreapp2.0": {
+        "projectReferences": {}
+      }
+    }
+  },
+  "frameworks": {
+    "netcoreapp2.0": {
+      "dependencies": {
+        "Microsoft.NETCore.App": {
+          "target": "Package",
+          "version": "2.0.0"
+        },
+        "Newtonsoft.Json": {
+          "target": "Package",
+          "version": "10.0.2"
+        },
+        "EntryPoint": {
+          "target": "Package",
+          "version": "1.2.0"
+        }
+      },
+      "imports": [
+        "net461"
+      ],
+      "assetTargetFallback": true,
+      "warn": true
+    }
+  }
+}

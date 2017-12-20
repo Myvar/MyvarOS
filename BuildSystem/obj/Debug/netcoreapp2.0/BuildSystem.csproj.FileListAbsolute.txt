@@ -1,0 +1,10 @@
+/home/myvar/Desktop/GitHub/MyvarOS/BuildSystem/bin/Debug/netcoreapp2.0/BuildSystem.deps.json
+/home/myvar/Desktop/GitHub/MyvarOS/BuildSystem/bin/Debug/netcoreapp2.0/BuildSystem.runtimeconfig.json
+/home/myvar/Desktop/GitHub/MyvarOS/BuildSystem/bin/Debug/netcoreapp2.0/BuildSystem.runtimeconfig.dev.json
+/home/myvar/Desktop/GitHub/MyvarOS/BuildSystem/bin/Debug/netcoreapp2.0/BuildSystem.dll
+/home/myvar/Desktop/GitHub/MyvarOS/BuildSystem/bin/Debug/netcoreapp2.0/BuildSystem.pdb
+/home/myvar/Desktop/GitHub/MyvarOS/BuildSystem/obj/Debug/netcoreapp2.0/BuildSystem.csproj.CoreCompileInputs.cache
+/home/myvar/Desktop/GitHub/MyvarOS/BuildSystem/obj/Debug/netcoreapp2.0/BuildSystem.AssemblyInfoInputs.cache
+/home/myvar/Desktop/GitHub/MyvarOS/BuildSystem/obj/Debug/netcoreapp2.0/BuildSystem.AssemblyInfo.cs
+/home/myvar/Desktop/GitHub/MyvarOS/BuildSystem/obj/Debug/netcoreapp2.0/BuildSystem.dll
+/home/myvar/Desktop/GitHub/MyvarOS/BuildSystem/obj/Debug/netcoreapp2.0/BuildSystem.pdb
