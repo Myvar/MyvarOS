@@ -52,6 +52,9 @@ void kernel_HigherHalf()
 
   __asm__ __volatile__("sti");
 
+  tty_clear();
+  tty_log("MyvarOS has successfully booted");
+
   
   while (1);
 }
