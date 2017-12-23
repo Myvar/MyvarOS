@@ -1,0 +1,17 @@
+{
+    "files.associations": {
+        "*.asm11": "asm",
+        "memory.h": "c",
+        "mm.h": "c",
+        "vm.h": "c",
+        "stdarg.h": "c",
+        "*.ipp": "c",
+        "istream": "c",
+        "optional": "c",
+        "ostream": "c",
+        "ratio": "c",
+        "system_error": "c",
+        "type_traits": "c",
+        "cerrno": "c"
+    }
+}

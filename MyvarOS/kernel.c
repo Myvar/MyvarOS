@@ -5,8 +5,6 @@
 #include "idt.h"
 #include "isrs.h"
 #include "irq.h"
-#include "vm.h"
-#include "mm.h"
 
 extern unsigned char KERNEL_START_VADDR;
 extern unsigned char KERNEL_END_VADDR;
@@ -55,22 +53,5 @@ void kernel_HigherHalf()
   __asm__ __volatile__("sti");
 
   
-
-  unsigned char* exe = kmalloc(1);  
-  exe[0] = 255;
-
-  VM *test = vm_new(exe);
-  kfree(exe);
-
-  tty_log("Starting VM.");
-
-  vm_run_until_done(test);
-
-  tty_log("TestVM executed");
-
-  vm_free(test);
-
-  
-
   while (1);
 }
